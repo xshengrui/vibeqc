@@ -63,14 +63,14 @@ QUALIFICATION_SOURCE_PATHS = (
 )
 
 
-def _qualification_source_identity():
+def _qualification_source_identity(git_binary="git"):
     """Bind retained evidence to the exact git head and orchestration bytes."""
     git_head = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        [git_binary, "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
     dirty = bool(
         subprocess.check_output(
-            ["git", "status", "--porcelain", "--untracked-files=no"],
+            [git_binary, "status", "--porcelain", "--untracked-files=no"],
             cwd=ROOT,
             text=True,
         ).strip()
@@ -139,7 +139,7 @@ def run(args):
             f"{sorted(GROUND_TRUTH)}; unknown={unknown_molecules}"
         )
 
-    source_identity = _qualification_source_identity()
+    source_identity = _qualification_source_identity(git_binary=args.git_binary)
     if not args.compile_only and source_identity["worktree_dirty"]:
         raise RuntimeError(
             "real-device qualification requires a clean tracked worktree so "
@@ -437,6 +437,11 @@ if __name__ == "__main__":
         type=float,
         default=1800.0,
         help="NVCC timeout per tile shape in seconds (default: 1800)",
+    )
+    parser.add_argument(
+        "--git-binary",
+        default="git",
+        help="Path to git binary for the source-identity probe (default: git)",
     )
     args = parser.parse_args()
     run(args)
