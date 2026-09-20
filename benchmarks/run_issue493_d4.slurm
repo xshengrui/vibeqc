@@ -35,6 +35,8 @@ cmake -S . -B "${BUILD}" -G Ninja \
   -DCMAKE_CUDA_ARCHITECTURES=120 \
   -DVIBEQC_ENABLE_AOT_SHELLS=OFF
 cmake --build "${BUILD}" -j8 --target \
+  vibeqc_d4_reference_tests vibeqc_d4_reference_cuda_tests \
+  vibeqc_d4_eeq_tests vibeqc_d4_eeq_cuda_tests vibeqc_d4_schedule_cuda_tests \
   vibeqc_d4_production_tests vibeqc_d4_ragged_tests vibeqc_dft_api_tests
 export VIBEQC_LIBRARY="${BUILD}/libvibeqc.so"
 export VIBEQC_GPU_ALLOCATION_ID="slurm:${SLURM_JOB_ID}"

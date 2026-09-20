@@ -20,13 +20,17 @@ before execution and hashes them into its cache/replay identity.
 
 ## Scheduling and resources
 
-CPU reuses one worst-system workspace. CUDA uses a fixed persistent pool of at
-most 32 worker blocks. Each block atomically claims another ragged member and
-reuses one worst-system workspace slot. Dense EEQ response storage is therefore
-bounded by worker slots times workspace(maximum_atoms), rather than every fleet
-member. maximum_bytes admission reduces the worker count down to one before
-rejecting a plan. Prepared coordinates are uploaded once; unchanged replay
-reuses them and changed geometry uploads the packed coordinate buffer.
+CPU reuses one worst-system workspace. CUDA separates the two scientific
+primitives instead of owning a second fixed-charge implementation. EEQ uses at
+most 32 bounded worker blocks; each block atomically claims another ragged
+member and reuses one worst-system solve workspace plus one dq/dR scratch.
+Fixed-charge pair/ATM work is then delegated to the block-cooperative scheduler
+owned by #735, whose workspace is linear in total atoms. Dense EEQ response
+storage is therefore bounded by worker slots times the largest molecule rather
+than every fleet member. maximum_bytes admission reduces the EEQ worker count
+down to one before rejecting a plan. Prepared coordinates are uploaded once;
+unchanged replay reuses them and changed geometry uploads the packed coordinate
+buffer. The final chain-rule composition is compiler-generated.
 
 Diagnostics retain plan/execution host bytes, device/table/workspace bytes,
 worker/workspace slots, execution count, changed/unchanged replays, coordinate

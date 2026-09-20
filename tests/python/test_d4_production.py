@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from vibeqc import Calculator, D4CorrectionBatch, evaluate_d4_correction
+from vibeqc import Calculator, D4CorrectionBatch, ResourceBudget, evaluate_d4_correction
 
 
 _NUMBERS = np.array([6, 8, 7, 1], dtype=np.int32)
@@ -113,6 +113,18 @@ def test_public_named_pbe_d4_cpu_adds_native_correction() -> None:
         Calculator(
             method="pbe-d4-rks", basis="sto-3g", device="cuda", precision="auto"
         )
+
+
+def test_public_named_pbe_d4_global_resource_plan_fails_closed() -> None:
+    atoms = [("H", (0.0, 0.0, -0.7)), ("H", (0.0, 0.0, 0.7))]
+    calculator = Calculator(
+        method="pbe-d4-rks",
+        basis="sto-3g",
+        device="cpu",
+        resource_budget=ResourceBudget(host_bytes=1 << 30),
+    )
+    with pytest.raises(NotImplementedError, match="KS planning supports"):
+        calculator.estimate_resources([atoms])
 
 
 def test_production_cuda_matches_cpu_and_replay_accounting() -> None:
