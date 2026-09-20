@@ -161,6 +161,19 @@ def test_production_cuda_matches_cpu_and_replay_accounting() -> None:
 
 def test_public_named_pbe_d4_cuda_matches_cpu() -> None:
     atoms = [("H", (0.0, 0.0, -0.7)), ("H", (0.0, 0.0, 0.7))]
+    numbers = np.array([1, 1], dtype=np.int32)
+    positions = np.array([[0.0, 0.0, -0.7], [0.0, 0.0, 0.7]], dtype=np.float64)
+    pair_cpu = evaluate_d4_correction(
+        "PBE-D4(BJ-EEQ-ATM)", numbers, positions, device="cpu"
+    )
+    pair_cuda = evaluate_d4_correction(
+        "PBE-D4(BJ-EEQ-ATM)", numbers, positions, device="cuda"
+    )
+    assert pair_cuda.energy == pytest.approx(pair_cpu.energy, abs=2.0e-13)
+    np.testing.assert_allclose(pair_cuda.charges, pair_cpu.charges, atol=1.0e-12, rtol=0.0)
+    assert pair_cpu.atm_energy == pytest.approx(0.0, abs=1.0e-18)
+    assert pair_cuda.atm_energy == pytest.approx(0.0, abs=1.0e-18)
+
     cpu = Calculator(method="pbe-d4-rks", basis="sto-3g", device="cpu").singlepoint(
         atoms, properties=("energy",)
     )

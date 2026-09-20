@@ -42,10 +42,12 @@ export VIBEQC_LIBRARY="${BUILD}/libvibeqc.so"
 export VIBEQC_GPU_ALLOCATION_ID="slurm:${SLURM_JOB_ID}"
 
 ctest --test-dir "${BUILD}" --output-on-failure -R \
-  'vibeqc_d4_(reference|eeq|production|ragged)|vibeqc_dft_api'
+  'vibeqc_d4_(reference|eeq|production|ragged|schedule)'
 
 "${BUILD}/vibeqc_d4_production_tests" cuda
 "${BUILD}/vibeqc_d4_ragged_tests" cuda
+CUDA_VISIBLE_DEVICES="" "${BUILD}/vibeqc_dft_api_tests"
+"${PYTHON}" -m pytest -q tests/python/test_d4_production.py tests/python/test_d4_eeq.py
 
 compute-sanitizer --tool memcheck --error-exitcode=99 \
   "${BUILD}/vibeqc_d4_production_tests" cuda \
