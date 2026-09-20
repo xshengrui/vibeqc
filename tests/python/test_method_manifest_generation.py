@@ -24,6 +24,7 @@ EXPECTED_ABI_IDS = {
     "rccsd": 12,
     "pbe0-rks": 13,
     "pbe0-uks": 14,
+    "pbe-d4-rks": 15,
 }
 
 
@@ -54,7 +55,7 @@ def test_public_method_abi_ids_are_explicit_and_stable() -> None:
 def test_public_method_provider_sets_are_generated() -> None:
     assert _generated_methods.HF_METHOD_IDS == frozenset({1, 2})
     assert _generated_methods.NATIVE_DFT_METHOD_IDS == frozenset(
-        {6, 7, 8, 9, 10, 11, 13, 14}
+        {6, 7, 8, 9, 10, 11, 13, 14, 15}
     )
 
 

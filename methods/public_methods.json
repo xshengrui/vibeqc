@@ -158,6 +158,17 @@
         "energy"
       ],
       "supports_batch": true
+    },
+    {
+      "name": "pbe-d4-rks",
+      "symbol": "PBE_D4_RKS",
+      "abi_id": 15,
+      "family": "density_functional",
+      "provider": "dft",
+      "properties": [
+        "energy"
+      ],
+      "supports_batch": true
     }
   ]
 }
