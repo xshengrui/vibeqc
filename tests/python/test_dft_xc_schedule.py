@@ -222,3 +222,29 @@ def test_dft_endpoint_gate_requires_matched_complete_interleaved_evidence() -> N
 
     with pytest.raises(ValueError, match="at least five"):
         dft_endpoint_gate(baseline[:4], candidate[:4])
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("energies", [-1.0, -1.0]),
+        ("forces", [[[0.0, 0.0, 0.0]]]),
+        ("forces", [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+    ],
+)
+def test_dft_endpoint_gate_rejects_broadcastable_result_layouts(
+    field: str, value: object
+) -> None:
+    baseline = [endpoint_sample(1.0, i) for i in range(6)]
+    candidate = [
+        endpoint_sample(
+            0.8,
+            i,
+            schedule_identity="candidate-schedule",
+            source_hash="candidate-source",
+        )
+        for i in range(6)
+    ]
+    candidate[0][field] = value
+    with pytest.raises(ValueError, match="DFT endpoint"):
+        dft_endpoint_gate(baseline, candidate)

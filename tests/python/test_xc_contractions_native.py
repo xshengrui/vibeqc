@@ -221,6 +221,40 @@ def test_prepared_xc_builds_profile_workload_from_actual_scientific_state(
             )
 
 
+def test_prepared_xc_rejects_replaced_schedule_identity(
+    native_factory: typing.Any,
+) -> None:
+    meta, data, grid = fixture("h2")
+    with (
+        NativeAO(**basis_arguments(meta)) as basis,
+        PreparedXCContractions(
+            native_factory("PBE", "potential"), basis, grid, tile_points=7
+        ) as prepared,
+    ):
+        original = prepared.schedule
+        prepared.schedule = replace(original, point_tile=8)
+        with pytest.raises(ValueError, match="stale grid/XC schedule"):
+            prepared.tuning_workload(
+                architecture="sm_120",
+                source_identity="a" * 64,
+                density_route="density_matrix",
+            )
+
+        prepared.schedule = "host_unfused"
+        with pytest.raises(ValueError, match="stale grid/XC schedule"):
+            prepared.execute(data["density_spin"])
+
+        prepared.schedule = original
+        workload = prepared.tuning_workload(
+            architecture="sm_120",
+            source_identity="a" * 64,
+            density_route="density_matrix",
+        )
+        assert workload.observable == "potential"
+        result = prepared.execute(data["density_spin"])
+        assert np.isfinite(result["energy"])
+
+
 def test_native_spatial_mask_matches_independent_zeroed_collocation(
     native_factory: typing.Any,
 ) -> None:

@@ -250,6 +250,28 @@ def dft_endpoint_gate(
     """Promote DFT schedules only from matched synchronized energy+force endpoints."""
     if len(baseline) != len(candidate) or len(baseline) < 5:
         raise ValueError("DFT endpoint gate requires at least five paired repeats")
+    energy_shape = None
+    force_shape = None
+    for sample in baseline + candidate:
+        if "energies" not in sample or "forces" not in sample:
+            raise ValueError("DFT endpoint energy/force arrays are required")
+        energies = np.asarray(sample["energies"])
+        forces = np.asarray(sample["forces"])
+        if energies.ndim != 1 or energies.size == 0:
+            raise ValueError("DFT endpoint energies must be a nonempty 1D system array")
+        if (
+            forces.ndim != 3
+            or forces.shape[0] != energies.shape[0]
+            or forces.shape[1] < 1
+            or forces.shape[2] != 3
+        ):
+            raise ValueError(
+                "DFT endpoint forces must have shape (system, atom, 3) matching energies"
+            )
+        if energy_shape is None:
+            energy_shape, force_shape = energies.shape, forces.shape
+        elif energies.shape != energy_shape or forces.shape != force_shape:
+            raise ValueError("DFT endpoint energy/force layouts must match exactly")
     result = endpoint_gate(baseline, candidate, minimum_speedup=minimum_speedup)
     failures = list(result["failures"])
     identities = {sample.get("scientific_identity") for sample in baseline + candidate}
