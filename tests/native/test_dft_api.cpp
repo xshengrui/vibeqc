@@ -686,10 +686,13 @@ int main() {
         if (ks == VIBEQC_METHOD_LDA_RKS) {
           // Cover both the owner and generated-XC error boundaries. Neither
           // runtime nor allocation failure may be hidden by a cold warm retry.
-          for (const auto& [fail, expected_status] :
-               {std::pair{ks_cuda_fail_next_runtime_for_test_v1, VIBEQC_STATUS_CUDA_ERROR},
-                std::pair{xc_cuda_fail_next_runtime_for_test_v1, VIBEQC_STATUS_CUDA_ERROR},
-                std::pair{xc_cuda_fail_next_allocation_for_test_v1, VIBEQC_STATUS_OUT_OF_MEMORY}}) {
+          using fail_function = void (*)();
+          const std::array<std::pair<fail_function, vibeqc_status>, 3> failures{{
+              {&ks_cuda_fail_next_runtime_for_test_v1, VIBEQC_STATUS_CUDA_ERROR},
+              {&xc_cuda_fail_next_runtime_for_test_v1, VIBEQC_STATUS_CUDA_ERROR},
+              {&xc_cuda_fail_next_allocation_for_test_v1, VIBEQC_STATUS_OUT_OF_MEMORY},
+          }};
+          for (const auto& [fail, expected_status] : failures) {
             fail();
             require(vibeqc_calculation_execute(cuda_calculation, &cuda_result) == expected_status,
                     "CUDA KS runtime failure lost its public status");
