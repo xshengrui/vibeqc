@@ -148,3 +148,29 @@ def test_projection_memory_budget_rejection_falls_back_to_target() -> None:
     assert "maximum_host_bytes" in run.diagnostics["projection"]["reason"]
     assert run.target.converged and run.target.restart_origin == "cold"
     assert run.verification.target_established
+
+
+def test_verification_memory_budget_rejects_before_extra_fock_build() -> None:
+    source, target = calculators()
+    problem = TargetProblem.from_calculator(target, ATOMS)
+    plan = make_deterministic_hf_plan(
+        problem,
+        source,
+        target,
+        ATOMS,
+        budget=ProgressiveBudget(
+            maximum_source_iterations=20,
+            maximum_total_iterations=120,
+            maximum_verification_host_bytes=1,
+        ),
+    )
+
+    run = run_progressive_hf(plan, source, target, ATOMS)
+
+    assert run.target.converged
+    assert run.verification.status == "budget_exhausted"
+    assert not run.verification.target_established
+    assert run.executions[1].fock_builds == run.target.fock_builds
+    audit = run.diagnostics["physical_residual_audit"]
+    assert audit["status"] == "budget_exhausted"
+    assert audit["resources"]["status"] == "rejected_controller_budget"

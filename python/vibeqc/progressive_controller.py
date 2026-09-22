@@ -657,6 +657,7 @@ def finalize_hf_verification(
     accuracy: AccuracyAssessment | None = None,
     physical_audit: HFPhysicalResidualAudit | None = None,
     physical_audit_error: str | None = None,
+    physical_audit_budget_error: str | None = None,
 ) -> FinalVerification:
     """Derive a fail-closed final record; serialized status is never trusted."""
     if (
@@ -691,6 +692,12 @@ def finalize_hf_verification(
     residual_source = "native_result" if residual is not None else "unavailable"
     audit_identity = None
     energy_difference = None
+    if physical_audit is not None and (
+        physical_audit_error is not None or physical_audit_budget_error is not None
+    ):
+        raise ValueError("a completed physical audit cannot also carry an error")
+    if physical_audit_error is not None and physical_audit_budget_error is not None:
+        raise ValueError("physical audit failure must have one disposition")
     if physical_audit is not None:
         if not isinstance(physical_audit, HFPhysicalResidualAudit):
             raise TypeError("physical audit must be an HFPhysicalResidualAudit")
@@ -710,11 +717,19 @@ def finalize_hf_verification(
             target_reasons.append(
                 "fixed-density audit energy differs from target result"
             )
+    elif physical_audit_budget_error is not None:
+        residual_source = "verification_budget_exhausted"
+        budget_reasons.append(
+            "target physical residual audit exceeded the verification budget: "
+            f"{physical_audit_budget_error}"
+        )
     elif physical_audit_error is not None:
         target_reasons.append(
             f"target physical residual audit failed: {physical_audit_error}"
         )
-    if residual is None or not math.isfinite(float(residual)):
+    if physical_audit_budget_error is not None:
+        pass
+    elif residual is None or not math.isfinite(float(residual)):
         target_reasons.append("target physical residual is unavailable")
     elif (residual_max if residual_max is not None else residual) > typing.cast(
         "float", problem.convergence.physical_residual_rms
@@ -797,7 +812,7 @@ def finalize_hf_verification(
         reasons.append(f"observable accuracy status is {accuracy_status}")
     return FinalVerification(
         status=status,
-        target_established=not target_reasons,
+        target_established=(not target_reasons and physical_audit_budget_error is None),
         problem_identity=problem.identity,
         requested_model_identity=problem.model.identity,
         actual_model_identity=actual_model.identity,
@@ -837,6 +852,124 @@ class ProgressiveHFResult:
         return self.verification.succeeded
 
 
+class _VerificationBudgetExceeded(MemoryError):
+    """Fail closed before verification takes ownership of native resources."""
+
+    def __init__(self, message: str, diagnostics: dict) -> None:
+        super().__init__(message)
+        self.diagnostics = deepcopy(diagnostics)
+
+
+def _admit_target_physical_audit(
+    problem: TargetProblem,
+    calculator: typing.Any,
+    atoms: tuple[Atom, ...],
+    density: np.ndarray,
+    *,
+    charge: int,
+    multiplicity: int,
+    maximum_host_bytes: int,
+    diagnostics: dict | None = None,
+) -> dict:
+    """Reserve provider and controller numeric storage before native ownership."""
+    from vibeqc_compiler.common.resources import ResourceBudget
+
+    if type(maximum_host_bytes) is not int or maximum_host_bytes < 1:
+        raise ValueError("verification host budget must be a positive integer")
+    spins = 2 if problem.model.method == "uhf" else 1
+    raw = np.asarray(density)
+    if (
+        raw.ndim != 3
+        or raw.shape[0] != spins
+        or raw.shape[1] < 1
+        or raw.shape[1] != raw.shape[2]
+        or not np.issubdtype(raw.dtype, np.number)
+        or np.issubdtype(raw.dtype, np.complexfloating)
+        or not np.isfinite(raw).all()
+    ):
+        raise ValueError("target audit density shape/spin/type/finiteness mismatch")
+    nbf = raw.shape[1]
+    matrix_bytes = 8 * nbf * nbf
+    # The provider plan owns its fixed-density Fock inputs/outputs.  Above that
+    # envelope, the controller simultaneously retains the overlap and either
+    # the residual products/result or the residual plus one hashing copy.
+    controller_matrices = max(spins + 3, 1 + 2 * spins)
+    controller_host_bytes = controller_matrices * matrix_bytes
+    record = {
+        "schema": "vibeqc.progressive_hf.verification_resources/v1",
+        "status": "planning",
+        "host_budget_bytes": maximum_host_bytes,
+        "controller_host_bytes": controller_host_bytes,
+        "controller_matrix_count": controller_matrices,
+        "nbf": nbf,
+        "spins": spins,
+    }
+
+    def publish(**values: typing.Any) -> dict:
+        record.update(values)
+        if diagnostics is not None:
+            diagnostics.clear()
+            diagnostics.update(deepcopy(record))
+        return deepcopy(record)
+
+    if controller_host_bytes > maximum_host_bytes:
+        publish(status="rejected_controller_budget")
+        raise _VerificationBudgetExceeded(
+            "controller-owned physical-audit matrices require "
+            f"{controller_host_bytes} host bytes; budget is {maximum_host_bytes}",
+            record,
+        )
+    provider_budget = maximum_host_bytes - controller_host_bytes
+    try:
+        provider_plan = calculator.estimate_resources(
+            (atoms,),
+            charges=(charge,),
+            multiplicities=(multiplicity,),
+            budget=ResourceBudget(host_bytes=provider_budget),
+        )
+    except (MemoryError, NotImplementedError) as error:
+        publish(
+            status="rejected_provider_envelope",
+            provider_host_budget_bytes=provider_budget,
+            provider_status="error",
+            provider_diagnostic=str(error),
+        )
+        raise _VerificationBudgetExceeded(
+            f"provider envelope could not be admitted: {error}", record
+        ) from error
+    if provider_plan.status != "feasible":
+        publish(
+            status="rejected_provider_envelope",
+            provider_host_budget_bytes=provider_budget,
+            provider_status=provider_plan.status,
+            provider_diagnostic=provider_plan.diagnostic,
+        )
+        raise _VerificationBudgetExceeded(
+            "provider envelope could not be admitted: "
+            f"{provider_plan.diagnostic or provider_plan.status}",
+            record,
+        )
+    provider_host_bytes = int(provider_plan.peak_bytes.get("host", 0))
+    if provider_host_bytes > provider_budget:
+        publish(
+            status="rejected_provider_envelope",
+            provider_host_budget_bytes=provider_budget,
+            provider_host_bytes=provider_host_bytes,
+            provider_status="invalid_feasible_plan",
+        )
+        raise _VerificationBudgetExceeded(
+            "provider envelope exceeds its admitted host budget", record
+        )
+    return publish(
+        status="admitted",
+        provider_host_budget_bytes=provider_budget,
+        provider_host_bytes=provider_host_bytes,
+        provider_plan_identity=provider_plan.identity,
+        provider_status=provider_plan.status,
+        total_host_bytes=provider_host_bytes + controller_host_bytes,
+    )
+
+
 def _audit_target_physical_residual(
     problem: TargetProblem,
     calculator: typing.Any,
@@ -847,12 +980,23 @@ def _audit_target_physical_residual(
     charge: int,
     multiplicity: int,
     maximum_host_bytes: int,
+    resource_diagnostics: dict | None = None,
 ) -> HFPhysicalResidualAudit:
     """Rebuild the exact target Fock once and audit FDS-SDF at its final density."""
-    from vibeqc_compiler.dft import NativeAO
-
     started = time.perf_counter()
     unrestricted = problem.model.method == "uhf"
+    _admit_target_physical_audit(
+        problem,
+        calculator,
+        atoms,
+        density,
+        charge=charge,
+        multiplicity=multiplicity,
+        maximum_host_bytes=maximum_host_bytes,
+        diagnostics=resource_diagnostics,
+    )
+    from vibeqc_compiler.dft import NativeAO
+
     fitted = calculator._density_fitting_mode != _native.DENSITY_FITTING_NONE
     approximation = "density_fitted" if fitted else "exact"
     with ExitStack() as stack:
@@ -979,6 +1123,9 @@ def run_progressive_hf(
     target_density = None
     physical_audit = None
     physical_audit_error = None
+    physical_audit_budget_error = None
+    physical_audit_admission_rejected = False
+    physical_audit_resources: dict = {}
     source_setup_started = time.perf_counter()
     with source_calculator.prepare_batch(
         [atoms], charges=[charge], multiplicities=[multiplicity]
@@ -1065,10 +1212,17 @@ def run_progressive_hf(
                 charge=charge,
                 multiplicity=multiplicity,
                 maximum_host_bytes=plan.budget.maximum_verification_host_bytes,
+                resource_diagnostics=physical_audit_resources,
             )
+        except _VerificationBudgetExceeded as error:
+            physical_audit_budget_error = str(error)
+            physical_audit_resources.update(error.diagnostics)
+            physical_audit_admission_rejected = True
+        except MemoryError as error:
+            physical_audit_budget_error = str(error)
+            physical_audit_resources.setdefault("status", "runtime_budget_failure")
         except (
             ArithmeticError,
-            MemoryError,
             NotImplementedError,
             RuntimeError,
             ValueError,
@@ -1078,7 +1232,10 @@ def run_progressive_hf(
     target_fock_builds = target_result.fock_builds
     if physical_audit is not None and target_fock_builds is not None:
         target_fock_builds += 1
-    elif physical_audit_error is not None:
+    elif physical_audit_error is not None or (
+        physical_audit_budget_error is not None
+        and not physical_audit_admission_rejected
+    ):
         target_fock_builds = None
     target_residual = (
         physical_audit.rms_commutator
@@ -1119,6 +1276,7 @@ def run_progressive_hf(
         accuracy=accuracy,
         physical_audit=physical_audit,
         physical_audit_error=physical_audit_error,
+        physical_audit_budget_error=physical_audit_budget_error,
     )
     diagnostics = {
         "schema": "vibeqc.progressive_hf",
@@ -1136,9 +1294,21 @@ def run_progressive_hf(
         "total_seconds": time.perf_counter() - started,
         "projection": deepcopy(projection),
         "physical_residual_audit": (
-            asdict(physical_audit)
+            {
+                "status": "succeeded",
+                **asdict(physical_audit),
+                "resources": deepcopy(physical_audit_resources),
+            }
             if physical_audit is not None
-            else {"status": "unavailable", "reason": physical_audit_error}
+            else {
+                "status": (
+                    "budget_exhausted"
+                    if physical_audit_budget_error is not None
+                    else "unavailable"
+                ),
+                "reason": physical_audit_budget_error or physical_audit_error,
+                "resources": deepcopy(physical_audit_resources),
+            }
         ),
         "verification_status": verification.status,
     }

@@ -82,6 +82,13 @@ Diagnostics separately report source/target setup and execution, projection,
 final verification and context cleanup, while `total_seconds` covers the complete
 endpoint.
 
+Before the independent target-Fock audit acquires `NativeAO` or `FockPlan`
+ownership, the controller admits the existing HF provider resource envelope and
+separately reserves its overlap, residual-matrix and hashing-copy storage against
+`maximum_verification_host_bytes`. Rejection is `budget_exhausted`, not a
+scientific target failure, and the resource diagnostic records provider,
+controller and total host bounds.
+
 A failed source solve or rejected/out-of-budget projection skips the proposal
 and executes the unchanged target from its ordinary cold guess. The target stage
 is never replaced by a source result. Target failure is returned in

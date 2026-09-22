@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import numpy as np
 import pytest
+from vibeqc import progressive_controller
 from vibeqc.accuracy import (
     AccuracyAssessment,
     ErrorEvidence,
@@ -411,3 +412,96 @@ def test_unverifiable_fock_budget_fails_closed() -> None:
     )
     assert final.status == "budget_exhausted"
     assert any("could not be verified" in item for item in final.reasons)
+
+
+def test_verification_workspace_rejects_before_provider_planning() -> None:
+    calls: list[object] = []
+    calculator = SimpleNamespace(
+        estimate_resources=lambda *args, **kwargs: calls.append((args, kwargs))
+    )
+
+    with pytest.raises(MemoryError, match="controller-owned"):
+        progressive_controller._admit_target_physical_audit(
+            PROBLEM,
+            calculator,
+            (),
+            np.zeros((1, 2, 2)),
+            charge=0,
+            multiplicity=1,
+            maximum_host_bytes=1,
+        )
+
+    assert not calls
+
+
+def test_verification_workspace_reserves_provider_and_controller_bound() -> None:
+    calls: list[object] = []
+    provider = SimpleNamespace(
+        status="feasible",
+        diagnostic=None,
+        identity="f" * 64,
+        peak_bytes={"host": 64},
+    )
+
+    def estimate(*args: object, **kwargs: object) -> object:
+        calls.append((args, kwargs))
+        return provider
+
+    admitted = progressive_controller._admit_target_physical_audit(
+        PROBLEM,
+        SimpleNamespace(estimate_resources=estimate),
+        (),
+        np.zeros((1, 2, 2)),
+        charge=0,
+        multiplicity=1,
+        maximum_host_bytes=192,
+    )
+
+    assert admitted["controller_host_bytes"] == 128
+    assert admitted["provider_host_bytes"] == 64
+    assert admitted["total_host_bytes"] == 192
+    assert calls[0][1]["budget"].host_bytes == 64
+
+
+def test_verification_workspace_rejects_unadmitted_provider_envelope() -> None:
+    provider = SimpleNamespace(
+        status="infeasible",
+        diagnostic="provider envelope exceeds remaining host budget",
+        identity="f" * 64,
+        peak_bytes={"host": 65},
+    )
+    calculator = SimpleNamespace(estimate_resources=lambda *args, **kwargs: provider)
+
+    with pytest.raises(MemoryError, match="provider envelope"):
+        progressive_controller._admit_target_physical_audit(
+            PROBLEM,
+            calculator,
+            (),
+            np.zeros((1, 2, 2)),
+            charge=0,
+            multiplicity=1,
+            maximum_host_bytes=192,
+        )
+
+
+def test_verification_workspace_rejection_is_budget_exhausted() -> None:
+    output = result(accuracy=assessment(observed=True))
+    output.physical_residual_rms = None
+    selected = plan()
+
+    final = finalize_hf_verification(
+        PROBLEM,
+        selected.stages[1],
+        output,
+        TARGET_MODEL,
+        TARGET_HASHES,
+        selected.budget,
+        (execution(StageRole.INITIALIZATION), execution(StageRole.TARGET)),
+        physical_audit_budget_error="provider envelope exceeds verification budget",
+    )
+
+    assert final.status == "budget_exhausted"
+    assert not final.target_established
+    assert final.physical_residual_source == "verification_budget_exhausted"
+    assert any("provider envelope" in item for item in final.reasons)
+    assert not any("audit failed" in item for item in final.reasons)
