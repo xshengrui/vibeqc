@@ -187,4 +187,4 @@ def test_verification_budget_rejects_before_fock_rebuild(
     assert audit["resources"]["status"] == (
         "rejected_provider_envelope" if provider_limit else "rejected_controller_budget"
     )
-    assert "budget" in audit["reason"]
+    assert ("provider envelope" if provider_limit else "budget") in audit["reason"]
