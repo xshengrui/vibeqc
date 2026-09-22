@@ -28,10 +28,6 @@ residual absent, the controller rebuilds the exact target Fock once at the final
 density and evaluates the target overlap commutator. The audit has explicit
 operator/density/overlap identities, time and Fock-work accounting; it does not
 reuse density-update RMS as a substitute.
-Before acquiring native audit ownership, the controller combines the existing
-HF provider resource envelope with an explicit bound for its overlap, residual
-temporaries and hashing copies. An unprovable or over-budget envelope stops
-before the audit Fock rebuild and is reported as budget exhaustion.
 For density fitting, an omitted auxiliary basis retains HF's existing resolved
 model: the orbital basis is also the auxiliary basis.
 
@@ -64,16 +60,12 @@ produce overall `verified` status.
   partial, extra-atom or complex arrays are not target observables.
 - A missing native HF residual requires an exact fixed-density target audit; the
   extra Fock build and elapsed time remain part of endpoint work.
-- Verification resource admission precedes `NativeAO`/`FockPlan`; a rejected
-  admission performs no extra Fock build and is not relabeled as scientific
-  target failure.
 
 ## Evidence
 
 - `tests/python/test_progressive_controller.py` covers immutable schemas,
   substituted targets, missing strict cleanup, unverified accuracy and budget
-  failure, including target-bound force shape/dtype rejection and pre-native
-  verification resource admission.
+  failure, including target-bound force shape and dtype rejection.
 - `tests/python/test_progressive_controller_native.py` covers the real HF
   source/projection/target path plus cold fallback after source and projection
   failures.

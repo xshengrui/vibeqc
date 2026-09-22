@@ -214,10 +214,12 @@ def verify(
 
 def test_target_problem_and_stage_plan_are_immutable_and_identity_stable() -> None:
     before = PROBLEM.identity
-    with pytest.raises(FrozenInstanceError):
-        PROBLEM.provider_identity = "x" * 64  # type: ignore[misc]
-    with pytest.raises(FrozenInstanceError):
-        stages()[0].allowed_next_stages = ()  # type: ignore[misc]
+    for owner, attribute, value in (
+        (PROBLEM, "provider_identity", "x" * 64),
+        (stages()[0], "allowed_next_stages", ()),
+    ):
+        with pytest.raises(FrozenInstanceError):
+            setattr(owner, attribute, value)
     assert PROBLEM.identity == before
 
 
@@ -454,13 +456,14 @@ def test_verification_workspace_reserves_provider_and_controller_bound() -> None
         np.zeros((1, 2, 2)),
         charge=0,
         multiplicity=1,
-        maximum_host_bytes=192,
+        maximum_host_bytes=704,
     )
 
-    assert admitted["controller_host_bytes"] == 128
+    assert admitted["controller_host_bytes"] == 640
     assert admitted["provider_host_bytes"] == 64
-    assert admitted["total_host_bytes"] == 192
-    assert calls[0][1]["budget"].host_bytes == 64
+    assert admitted["total_host_bytes"] == 704
+    assert calls[0][1]["budget"].host_bytes == 704
+    assert calls[0][1]["budget"].host_reserve_bytes == 640
 
 
 def test_verification_workspace_rejects_unadmitted_provider_envelope() -> None:
@@ -480,7 +483,7 @@ def test_verification_workspace_rejects_unadmitted_provider_envelope() -> None:
             np.zeros((1, 2, 2)),
             charge=0,
             multiplicity=1,
-            maximum_host_bytes=192,
+            maximum_host_bytes=704,
         )
 
 
@@ -505,3 +508,75 @@ def test_verification_workspace_rejection_is_budget_exhausted() -> None:
     assert final.physical_residual_source == "verification_budget_exhausted"
     assert any("provider envelope" in item for item in final.reasons)
     assert not any("audit failed" in item for item in final.reasons)
+
+
+@pytest.mark.parametrize("maximum_bytes", [1, 32, 128])
+def test_physical_audit_rejects_workspace_before_native_owners(
+    monkeypatch: pytest.MonkeyPatch, maximum_bytes: int
+) -> None:
+    import vibeqc.progressive_controller as controller
+    from vibeqc_compiler import dft
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        pytest.fail("native Fock/basis work started before verification admission")
+
+    monkeypatch.setattr(dft, "NativeAO", forbidden)
+    monkeypatch.setattr(controller, "FockPlan", forbidden)
+    calculator = SimpleNamespace(
+        _density_fitting_mode=0, _basis="sto-3g", _representation_name="cartesian"
+    )
+    with pytest.raises(MemoryError, match="verification"):
+        controller._audit_target_physical_residual(
+            PROBLEM,
+            calculator,
+            (),
+            np.eye(2)[None, :, :],
+            -1.0,
+            charge=0,
+            multiplicity=1,
+            maximum_host_bytes=maximum_bytes,
+        )
+
+
+def test_physical_audit_admits_provider_and_workspace_before_native_owners(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import vibeqc.progressive_controller as controller
+    from vibeqc_compiler import dft
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        pytest.fail("native Fock/basis work started before provider admission")
+
+    def estimate(systems: object, **kwargs: object) -> SimpleNamespace:
+        from vibeqc_compiler.common.resources import ResourceBudget
+
+        budget = kwargs["budget"]
+        assert isinstance(budget, ResourceBudget)
+        assert budget.host_bytes == 4096
+        assert budget.host_reserve_bytes > 8 * 2 * 2
+        return SimpleNamespace(
+            status="infeasible",
+            diagnostic="verification provider allocation exceeds budget",
+            identity="f" * 64,
+            peak_bytes={"host": 4096},
+        )
+
+    monkeypatch.setattr(dft, "NativeAO", forbidden)
+    monkeypatch.setattr(controller, "FockPlan", forbidden)
+    calculator = SimpleNamespace(
+        _density_fitting_mode=0,
+        _basis="sto-3g",
+        _representation_name="cartesian",
+        estimate_resources=estimate,
+    )
+    with pytest.raises(MemoryError, match="verification provider"):
+        controller._audit_target_physical_residual(
+            PROBLEM,
+            calculator,
+            (),
+            np.eye(2)[None, :, :],
+            -1.0,
+            charge=0,
+            multiplicity=1,
+            maximum_host_bytes=4096,
+        )

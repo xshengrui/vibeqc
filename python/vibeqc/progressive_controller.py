@@ -26,6 +26,9 @@ from .profiles import canonical_hash
 from .progressive import _retained_density, initialize_from
 from .projection import ProjectionPolicy, ProjectionRejected
 
+if typing.TYPE_CHECKING:
+    from .batch import BatchItemResult
+
 _SCHEMA_VERSION = 1
 
 
@@ -727,14 +730,13 @@ def finalize_hf_verification(
         target_reasons.append(
             f"target physical residual audit failed: {physical_audit_error}"
         )
-    if physical_audit_budget_error is not None:
-        pass
-    elif residual is None or not math.isfinite(float(residual)):
-        target_reasons.append("target physical residual is unavailable")
-    elif (residual_max if residual_max is not None else residual) > typing.cast(
-        "float", problem.convergence.physical_residual_rms
-    ):
-        target_reasons.append("target physical residual tolerance is unmet")
+    if physical_audit_budget_error is None:
+        if residual is None or not math.isfinite(float(residual)):
+            target_reasons.append("target physical residual is unavailable")
+        elif (residual_max if residual_max is not None else residual) > typing.cast(
+            "float", problem.convergence.physical_residual_rms
+        ):
+            target_reasons.append("target physical residual tolerance is unmet")
     requested_observables = {item.observable for item in problem.accuracy.observables}
     capabilities = {"energy"}
     if result.forces is not None:
@@ -839,8 +841,8 @@ def finalize_hf_verification(
 
 @dataclass(frozen=True)
 class ProgressiveHFResult:
-    target: object
-    source: object
+    target: BatchItemResult
+    source: BatchItemResult
     plan: DeterministicHFPlan
     executions: tuple[StageExecution, ...]
     verification: FinalVerification
@@ -890,10 +892,11 @@ def _admit_target_physical_audit(
         raise ValueError("target audit density shape/spin/type/finiteness mismatch")
     nbf = raw.shape[1]
     matrix_bytes = 8 * nbf * nbf
-    # The provider plan owns its fixed-density Fock inputs/outputs.  Above that
-    # envelope, the controller simultaneously retains the overlap and either
-    # the residual products/result or the residual plus one hashing copy.
-    controller_matrices = max(spins + 3, 1 + 2 * spins)
+    # Conservatively reserve controller snapshots, overlap, commutator products,
+    # immutable results and hashing copies above the existing full-HF provider
+    # envelope.  The provider inventory intentionally overestimates one fixed-D
+    # rebuild instead of introducing a second ERI/DF/native allocation model.
+    controller_matrices = 12 * spins + 8
     controller_host_bytes = controller_matrices * matrix_bytes
     record = {
         "schema": "vibeqc.progressive_hf.verification_resources/v1",
@@ -915,7 +918,7 @@ def _admit_target_physical_audit(
     if controller_host_bytes > maximum_host_bytes:
         publish(status="rejected_controller_budget")
         raise _VerificationBudgetExceeded(
-            "controller-owned physical-audit matrices require "
+            "controller-owned physical verification matrices require "
             f"{controller_host_bytes} host bytes; budget is {maximum_host_bytes}",
             record,
         )
@@ -925,7 +928,10 @@ def _admit_target_physical_audit(
             (atoms,),
             charges=(charge,),
             multiplicities=(multiplicity,),
-            budget=ResourceBudget(host_bytes=provider_budget),
+            budget=ResourceBudget(
+                host_bytes=maximum_host_bytes,
+                host_reserve_bytes=controller_host_bytes,
+            ),
         )
     except (MemoryError, NotImplementedError) as error:
         publish(
@@ -1220,7 +1226,11 @@ def run_progressive_hf(
             physical_audit_admission_rejected = True
         except MemoryError as error:
             physical_audit_budget_error = str(error)
-            physical_audit_resources.setdefault("status", "runtime_budget_failure")
+            if physical_audit_resources:
+                physical_audit_resources["admission_status"] = (
+                    physical_audit_resources.get("status")
+                )
+            physical_audit_resources["status"] = "runtime_budget_failure"
         except (
             ArithmeticError,
             NotImplementedError,

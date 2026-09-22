@@ -150,27 +150,41 @@ def test_projection_memory_budget_rejection_falls_back_to_target() -> None:
     assert run.verification.target_established
 
 
-def test_verification_memory_budget_rejects_before_extra_fock_build() -> None:
-    source, target = calculators()
+@pytest.mark.parametrize("fitted", [False, True])
+@pytest.mark.parametrize("provider_limit", [False, True])
+def test_verification_budget_rejects_before_fock_rebuild(
+    fitted: bool, provider_limit: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import vibeqc.progressive_controller as controller
+
+    source, target = calculators(fitted=fitted)
     problem = TargetProblem.from_calculator(target, ATOMS)
+    # The provider alone fits its own peak, but the additional audit buffers
+    # must also fit. This exercises real planning, not only the one-byte guard.
+    limit = (
+        target.estimate_resources([ATOMS]).peak_bytes["host"] if provider_limit else 1
+    )
     plan = make_deterministic_hf_plan(
         problem,
         source,
         target,
         ATOMS,
-        budget=ProgressiveBudget(
-            maximum_source_iterations=20,
-            maximum_total_iterations=120,
-            maximum_verification_host_bytes=1,
-        ),
+        budget=ProgressiveBudget(maximum_verification_host_bytes=limit),
     )
 
-    run = run_progressive_hf(plan, source, target, ATOMS)
+    def forbidden(*args: object, **kwargs: object) -> None:
+        pytest.fail("verification Fock rebuilt despite exhausted workspace budget")
 
+    monkeypatch.setattr(controller, "FockPlan", forbidden)
+    run = run_progressive_hf(plan, source, target, ATOMS)
     assert run.target.converged
     assert run.verification.status == "budget_exhausted"
     assert not run.verification.target_established
+    assert not run.succeeded
     assert run.executions[1].fock_builds == run.target.fock_builds
     audit = run.diagnostics["physical_residual_audit"]
     assert audit["status"] == "budget_exhausted"
-    assert audit["resources"]["status"] == "rejected_controller_budget"
+    assert audit["resources"]["status"] == (
+        "rejected_provider_envelope" if provider_limit else "rejected_controller_budget"
+    )
+    assert "budget" in audit["reason"]
