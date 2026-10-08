@@ -77,13 +77,16 @@ int main() {
 
 
 def test_point_batches_share_canonical_consumer_and_launch_width() -> None:
-    """Batching does not specialize/prune the canonical scientific consumer."""
+    """PBE variants retain the indexed schedule and canonical point formula."""
     source = emit_native_xc_contraction_kernels()
-    assert "evaluate_points<feature_terms, false, true>" in source
+    assert "evaluate_points<feature_terms, false, true," in source
+    assert "return &launch_point_batches<4, 32, true>;" in source
     assert "return &launch_point_batches<4, 32>;" in source
+    assert "PBE point batch launcher identity mismatch" in source
     assert "min(tile_points, domain_count - begin)" in source
+    assert "point::evaluate(true, rho, gradient, exchange_scale," in source
     assert (
-        source.count("xc = evaluate_semilocal_point(functional, rho, gradient, tau")
-        == 1
+        "xc = evaluate_semilocal_point<static_family>(functional, rho, gradient, tau,"
+        in source
     )
     assert "static_assert(!batched || !response)" in source
