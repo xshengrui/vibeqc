@@ -10,9 +10,11 @@ venv="$root/venv"
 build="$repo/build/issue-2072-sm90"
 mkdir -p "$run"
 cd "$repo"
-export CUDA_PATH=/usr/local/cuda
+export CUDA_PATH="$root/cuda-12.9"
 export PATH="$root/tools/bin:$venv/bin:$CUDA_PATH/bin:$PATH"
 export LD_LIBRARY_PATH="$root/tools/lib:$CUDA_PATH/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+test "$(sha256sum "$CUDA_PATH/bin/nvcc" | cut -d ' ' -f 1)" = \
+  df9974db233a0b7a6c6d59c0e5d74e011566104098bcb3553495ff1b95bdeaf6
 test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
 test -z "$(git status --porcelain)"
 
@@ -36,6 +38,7 @@ fi
 
 "$venv/bin/sccache" --version | tee "$run/sccache-version.txt"
 nvcc --version > "$run/nvcc-version.txt"
+sha256sum "$CUDA_PATH/bin/nvcc" > "$run/nvcc.sha256"
 nvidia-smi -L > "$run/device.txt"
 git rev-parse HEAD > "$run/source-head.txt"
 "$venv/bin/sccache" --show-stats > "$run/sccache-before.txt"
@@ -44,6 +47,7 @@ trap 'status=$?; "$venv/bin/sccache" --show-stats > "$run/sccache-after.txt"; pr
 cmake -S "$repo" -B "$build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_CUDA_COMPILER="$CUDA_PATH/bin/nvcc" \
+  -DCUDAToolkit_ROOT="$CUDA_PATH" \
   -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
   -DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++ \
   -DCMAKE_CXX_COMPILER_LAUNCHER="$venv/bin/sccache" \
