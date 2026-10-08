@@ -116,6 +116,17 @@ its buffers to the retained launcher; graph replay retains that entry.
 Unsupported functional/response pairs fail during preparation. See the
 [consumer specialization decision](../../.agents/notes/implemented/performance/2026-09-23-xc-point-consumers.md).
 
+The PBE physical and admitted signed-response point entries also have an
+experimental family-specialized lowering of the same canonical point algebra.
+`GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION=1` selects it when an owner is
+prepared; `0` or an unset value keeps the generic entry. Other families keep
+the generic entry. Invalid switch values fail when preparing a PBE owner. Batched PBE
+points inherit the prepared physical entry's identity, including after a
+changed-geometry owner is prepared. This switch does not change point tiles,
+batch admission, AO maps, precision, or the independent exact-exchange J/K
+provider. It is not a performance default pending source-matched device and
+complete-endpoint qualification.
+
 ### Bounded independent point submissions
 
 Ordinary native KS defaults to bounded batching of independent XC point domains:

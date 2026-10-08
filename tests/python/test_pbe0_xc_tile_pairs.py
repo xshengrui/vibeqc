@@ -28,6 +28,7 @@ def run_fake_campaign(
     mutation: str | None = None,
     *,
     point_batch_tiles: int | None = None,
+    point_specialization: bool = False,
 ) -> tuple[dict[str, Any], list[Any]]:
     """Exercise orchestration without a CUDA library, device or reference solve."""
     scientific = {
@@ -56,7 +57,11 @@ def run_fake_campaign(
         def __init__(self, tile: int) -> None:
             self.tile = tile
             self.batch_tiles = os.environ["GENERATIVEQC_CUDA_XC_BATCH_TILES"]
+            self.point_specialization = os.environ.get(
+                "GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION"
+            )
             self.batch_policies = []
+            self.point_policies = []
             self._warm_updates = True
             self.closed = False
             self.calls = []
@@ -71,8 +76,11 @@ def run_fake_campaign(
             assert strict is False and properties == ("energy", "forces")
             self.calls.append((coords, self._warm_updates))
             self.batch_policies.append(os.environ["GENERATIVEQC_CUDA_XC_BATCH_TILES"])
+            self.point_policies.append(
+                os.environ.get("GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION")
+            )
             forces, _ = self._public_dft_cuda_force()
-            candidate = self.tile == 512
+            candidate = self.tile == 512 or self.point_specialization == "1"
             replay = not self._warm_updates
             tile = 256 if candidate and mutation == "tile" else self.tile
             iterations = 2 if candidate and replay and mutation == "iterations" else 1
@@ -158,6 +166,8 @@ def run_fake_campaign(
     )
     if point_batch_tiles is not None:
         sys.argv.extend(["--point-batch-tiles", str(point_batch_tiles)])
+    if point_specialization:
+        sys.argv.append("--point-specialization")
     try:
         benchmark.main()
     finally:
@@ -182,6 +192,40 @@ def test_batch_policy_overrides_default_during_owner_rebuilds(
     for owner in owners:
         assert len(owner.batch_policies) == 14
         assert set(owner.batch_policies) == {owner.batch_tiles}
+
+
+@pytest.mark.parametrize("point_batch_tiles", [None, 32])
+def test_point_specialization_preserves_work_and_restores_policy(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, point_batch_tiles: int | None
+) -> None:
+    monkeypatch.setenv("GENERATIVEQC_CUDA_XC_BATCH_TILES", "99")
+    monkeypatch.setenv("GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION", "caller")
+    record, owners = run_fake_campaign(
+        monkeypatch,
+        tmp_path,
+        point_batch_tiles=point_batch_tiles,
+        point_specialization=True,
+    )
+    assert record["schema"] == "generativeqc.pbe0-xc-point-family-pairs.v1"
+    assert record["scf_tiles"] == {"baseline": 256, "candidate": 256}
+    assert record["point_consumer"] == {
+        "baseline": "generic",
+        "candidate": "pbe-specialized",
+    }
+    assert record["point_batch_request"] == (
+        {"tiles": point_batch_tiles, "device_bytes": 32 * 1024 * 1024}
+        if point_batch_tiles
+        else None
+    )
+    assert os.environ["GENERATIVEQC_CUDA_XC_BATCH_TILES"] == "99"
+    assert os.environ["GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION"] == "caller"
+    assert [owner.point_specialization for owner in owners] == ["0", "1"]
+    assert {owner.tile for owner in owners} == {256}
+    for owner in owners:
+        assert owner.batch_tiles == str(point_batch_tiles or 1)
+        assert set(owner.batch_policies) == {owner.batch_tiles}
+        assert set(owner.point_policies) == {owner.point_specialization}
+        assert len(owner.point_policies) == 14
 
 
 def test_tiles_force_policy_and_frozen_replays(

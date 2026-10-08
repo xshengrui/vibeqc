@@ -15,10 +15,40 @@ def verify_pairs(record: dict[str, Any], reference: dict[str, Any]) -> None:
     Independently converged arm snapshots must not be called identical density
     bytes, and cold/moved setup histories are not normalized into speed claims.
     """
-    assert record["schema"] == "generativeqc.pbe0-xc-tile-pairs.v1"
+    _verify_pairs(record, reference, point_family=False)
+
+
+def verify_point_family_pairs(
+    record: dict[str, Any], reference: dict[str, Any]
+) -> None:
+    """Audit fixed-work generic/PBE-specialized complete E+F comparisons."""
+    _verify_pairs(record, reference, point_family=True)
+
+
+def _verify_pairs(
+    record: dict[str, Any], reference: dict[str, Any], *, point_family: bool
+) -> None:
+    assert record["schema"] == (
+        "generativeqc.pbe0-xc-point-family-pairs.v1"
+        if point_family
+        else "generativeqc.pbe0-xc-tile-pairs.v1"
+    )
     assert record["stage"] == reference["stage"] == "complete"
     assert record["protocol"] == reference["protocol"]
-    assert record["scf_tiles"] == {"baseline": 256, "candidate": 512}
+    assert record["scf_tiles"] == {
+        "baseline": 256,
+        "candidate": 256 if point_family else 512,
+    }
+    if point_family:
+        assert record["point_specialization"] is True
+        assert record["point_consumer"] == {
+            "baseline": "generic",
+            "candidate": "pbe-specialized",
+        }
+        request = record["point_batch_request"]
+        assert request is None or (
+            request["tiles"] >= 2 and request["device_bytes"] >= 0
+        )
     assert record["force_tile_points"] == 256 and not record["feasibility"]
     assert record["density_scope"] == (
         "separate independently converged publicly frozen warm snapshots"
@@ -26,7 +56,7 @@ def verify_pairs(record: dict[str, Any], reference: dict[str, Any]) -> None:
     assert len(record["samples"]) == 20
     assert len(record["setup"]) == len(record["priming"]) == 4
     atoms, aos = record["protocol"]["atoms"], record["protocol"]["aos"]
-    assert atoms in (48, 96)
+    assert atoms in ((12, 48, 96) if point_family else (48, 96))
     points = atoms * 48 * 16 * 32
     pair_visits = points * atoms * (atoms - 1) // 2
     for group in ("setup", "priming", "samples"):
@@ -102,3 +132,6 @@ def verify_pairs(record: dict[str, Any], reference: dict[str, Any]) -> None:
                 rtol=0,
             )
         assert all(count == force_counts[0] for count in force_counts)
+        if point_family:
+            ao_work = [row["diagnostics"]["native_scf_ao_work"] for row in samples]
+            assert all(work == ao_work[0] for work in ao_work)
