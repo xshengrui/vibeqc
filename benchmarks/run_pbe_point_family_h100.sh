@@ -10,18 +10,29 @@ venv="$root/venv"
 build="$repo/build/issue-2072-sm90"
 mkdir -p "$run"
 cd "$repo"
+export CUDA_PATH=/usr/local/cuda
+export PATH="$root/tools/bin:$venv/bin:$CUDA_PATH/bin:$PATH"
+export LD_LIBRARY_PATH="$root/tools/lib:$CUDA_PATH/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
 test -z "$(git status --porcelain)"
 
-export CUDA_PATH=/usr/local/cuda
-export PATH="$venv/bin:$CUDA_PATH/bin:$PATH"
 export PYTHONPATH="$repo/python:$repo"
-export LD_LIBRARY_PATH="$CUDA_PATH/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export GENERATIVEQC_LIBRARY="$build/libgenerativeqc.so"
 export GENERATIVEQC_STATIONARY_CACHE="$run/jit-cache"
 export SCCACHE_DIR="$root/sccache"
 export OMP_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8 MKL_NUM_THREADS=8
 export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1
+
+if [ "${1:-}" = --probe ]; then
+  git --version
+  cmake --version
+  ninja --version
+  g++ --version
+  nvcc --version
+  "$venv/bin/sccache" --version
+  "$venv/bin/python" -c 'import cupy as cp, numpy, scipy, pyscf; print("CUDA devices:", cp.cuda.runtime.getDeviceCount())'
+  exit 0
+fi
 
 "$venv/bin/sccache" --version | tee "$run/sccache-version.txt"
 nvcc --version > "$run/nvcc-version.txt"
