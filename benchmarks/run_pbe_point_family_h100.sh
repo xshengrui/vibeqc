@@ -7,7 +7,7 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 root=/inspire/qb-ilm/project/chemicalreaction/czxs25220150/projects/vibeqc-2072-point-family
 run="$root/runs/$INSPIRE_JOB_NAME"
 venv="$root/venv"
-build="$repo/build/issue-2072-sm90"
+build="$repo/build/issue-2072-sm90-cuda129"
 mkdir -p "$run"
 cd "$repo"
 export CUDA_PATH="$root/cuda-12.9"
