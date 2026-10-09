@@ -33,9 +33,7 @@ def test_admitted_point_consumers(tmp_path: Path, native_cxx: object) -> None:
     batch_start = emitted.index(
         "CudaXcPointBatchLauncher resolve_point_batch_launcher("
     )
-    batch_end = emitted.index(
-        "CudaXcPointBatchPlan prepare_point_batch_plan(", batch_start
-    )
+    batch_end = emitted.index("bool compact_point_batch_admitted(", batch_start)
     batch_dispatch = emitted[batch_start:batch_end]
     source = tmp_path / "dispatch.cpp"
     source.write_text(
