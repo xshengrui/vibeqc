@@ -1,6 +1,6 @@
-#include "runtime/bounded_workspace.hpp"
+#include "solver/cpu/johnson_broyden.hpp"
 
-#include "model/common/scc_mixer.hpp"
+#include "runtime/bounded_workspace.hpp"
 // xtbloom's CUDA/MKL additional permission is in CUDA_MKL_LINKING_EXCEPTION.
 
 #include <algorithm>
@@ -14,9 +14,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace generativeqc::xtb::detail::common {
+namespace generativeqc::solver::cpu {
 
-struct SccMixerPlanData final {
+struct BroydenPlanData final {
+  BroydenStatusEncoding status_encoding{};
   std::int64_t batch_size = 0;
   std::int64_t history_size = 0;
   std::int64_t total_vector_elements = 0;
@@ -28,8 +29,8 @@ struct SccMixerPlanData final {
   std::size_t vector_workspace_size_bytes = 0u;
   std::size_t workspace_alignment = 0u;
   std::size_t field_count = 0u;
-  std::array<std::size_t, kSccMixerMaximumFields> field_offset_bytes{};
-  std::array<std::size_t, kSccMixerMaximumFields> field_size_bytes{};
+  std::array<std::size_t, kBroydenMaximumFields> field_offset_bytes{};
+  std::array<std::size_t, kBroydenMaximumFields> field_size_bytes{};
   std::size_t state_size_bytes = 0u;
   std::size_t workspace_size_bytes = 0u;
 
@@ -57,15 +58,15 @@ struct SccMixerPlanData final {
 
   std::vector<std::int64_t> vector_offsets;
   std::vector<std::int64_t> history_offsets;
-  std::array<std::vector<std::int64_t>, kSccMixerMaximumFields> field_system_offsets;
+  std::array<std::vector<std::int64_t>, kBroydenMaximumFields> field_system_offsets;
 };
 
 namespace {
 
-static_assert(std::is_trivially_copyable_v<SccMixerState>);
-static_assert(std::is_standard_layout_v<SccMixerState>);
-static_assert(std::is_trivially_copyable_v<SccMixerWorkspace>);
-static_assert(std::is_standard_layout_v<SccMixerWorkspace>);
+static_assert(std::is_trivially_copyable_v<BroydenState>);
+static_assert(std::is_standard_layout_v<BroydenState>);
+static_assert(std::is_trivially_copyable_v<BroydenWorkspace>);
+static_assert(std::is_standard_layout_v<BroydenWorkspace>);
 
 constexpr double kOmegaZero = 0.01;
 constexpr double kMinimumOmega = 1.0;
@@ -109,14 +110,6 @@ bool is_aligned(const void* pointer, std::size_t alignment) {
   return pointer != nullptr && reinterpret_cast<std::uintptr_t>(pointer) % alignment == 0u;
 }
 
-bool checked_add_size(std::size_t increment, std::size_t& value) {
-  if (value > std::numeric_limits<std::size_t>::max() - increment) {
-    return false;
-  }
-  value += increment;
-  return true;
-}
-
 using ::generativeqc::runtime::checked_multiply;
 
 bool checked_add_i64(std::int64_t increment, std::int64_t& value) {
@@ -136,22 +129,6 @@ bool checked_multiply_i64(std::int64_t first, std::int64_t second, std::int64_t&
   return true;
 }
 
-bool align_up(std::size_t value, std::size_t alignment, std::size_t& aligned) {
-  const std::size_t remainder = value % alignment;
-  const std::size_t padding = remainder == 0u ? 0u : alignment - remainder;
-  aligned = value;
-  return checked_add_size(padding, aligned);
-}
-
-bool append_segment(std::size_t bytes, std::size_t alignment, std::size_t& cursor,
-                    std::size_t& offset) {
-  if (!align_up(cursor, alignment, cursor)) {
-    return false;
-  }
-  offset = cursor;
-  return checked_add_size(bytes, cursor);
-}
-
 template <typename T>
 T* offset_pointer(void* base, std::size_t offset) {
   return reinterpret_cast<T*>(static_cast<std::byte*>(base) + offset);
@@ -168,8 +145,8 @@ bool vector_range(const void* pointer, std::size_t count, std::size_t element_si
   return checked_multiply(count, element_size, bytes) && make_range(pointer, bytes, range);
 }
 
-bool overlaps_plan_storage(const SccMixerPlan& plan, const AddressRange& range) {
-  const SccMixerPlanData* const data = plan.identity();
+bool overlaps_plan_storage(const BroydenPlan& plan, const AddressRange& range) {
+  const BroydenPlanData* const data = plan.identity();
   if (data == nullptr) {
     return true;
   }
@@ -177,7 +154,7 @@ bool overlaps_plan_storage(const SccMixerPlan& plan, const AddressRange& range) 
   if (!make_range(data, sizeof(*data), candidate) || ranges_overlap(range, candidate)) {
     return true;
   }
-  std::array<const std::vector<std::int64_t>*, 2u + kSccMixerMaximumFields> vectors{};
+  std::array<const std::vector<std::int64_t>*, 2u + kBroydenMaximumFields> vectors{};
   vectors[0] = &data->vector_offsets;
   vectors[1] = &data->history_offsets;
   for (std::size_t field = 0u; field < data->field_count; ++field) {
@@ -196,26 +173,30 @@ bool overlaps_plan_storage(const SccMixerPlan& plan, const AddressRange& range) 
   return false;
 }
 
-generativeqc_xtb_status_t validate_plan(const SccMixerPlan& plan, std::string& error) {
+BroydenResult validate_plan(const BroydenPlan& plan, std::string& error) {
   if (!plan.sealed()) {
     error = "SCC mixer plan is default-constructed, moved-from, or otherwise unsealed";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
 bool exact_pointer(const void* base, std::size_t offset, const void* candidate) {
-  return candidate == static_cast<const void*>(static_cast<const std::byte*>(base) + offset);
+  const auto begin = reinterpret_cast<std::uintptr_t>(base);
+  return offset <= std::numeric_limits<std::uintptr_t>::max() - begin &&
+         reinterpret_cast<std::uintptr_t>(candidate) == begin + offset;
 }
 
-generativeqc_xtb_status_t validate_state(const SccMixerPlan& plan, const SccMixerState& state,
-                                std::string& error) {
-  const SccMixerPlanData& data = *plan.identity();
+BroydenResult validate_state(const BroydenPlan& plan, const BroydenState& state,
+                             std::string& error) {
+  const BroydenPlanData& data = *plan.identity();
   AddressRange range;
-  if (!is_aligned(state.workspace_base, kSccMixerWorkspaceAlignment) ||
+  AddressRange descriptor;
+  if (!is_aligned(state.workspace_base, kBroydenWorkspaceAlignment) ||
       state.workspace_size_bytes < data.state_size_bytes ||
       !make_range(state.workspace_base, data.state_size_bytes, range) ||
-      state.plan_identity != &data ||
+      !make_range(&state, sizeof(state), descriptor) || ranges_overlap(range, descriptor) ||
+      state.plan_identity != &data || !(state.status_encoding == data.status_encoding) ||
       !exact_pointer(state.workspace_base, data.current_input_offset_bytes, state.current_inputs) ||
       !exact_pointer(state.workspace_base, data.previous_input_offset_bytes,
                      state.previous_inputs) ||
@@ -234,18 +215,20 @@ generativeqc_xtb_status_t validate_state(const SccMixerPlan& plan, const SccMixe
       !exact_pointer(state.workspace_base, data.initialized_offset_bytes, state.initialized) ||
       !exact_pointer(state.workspace_base, data.converged_offset_bytes, state.converged)) {
     error = "SCC mixer state is malformed or belongs to a different plan";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_workspace(const SccMixerPlan& plan, const SccMixerWorkspace& workspace,
-                                    std::string& error) {
-  const SccMixerPlanData& data = *plan.identity();
+BroydenResult validate_workspace(const BroydenPlan& plan, const BroydenWorkspace& workspace,
+                                 std::string& error) {
+  const BroydenPlanData& data = *plan.identity();
   AddressRange range;
-  if (!is_aligned(workspace.workspace_base, kSccMixerWorkspaceAlignment) ||
+  AddressRange descriptor;
+  if (!is_aligned(workspace.workspace_base, kBroydenWorkspaceAlignment) ||
       workspace.workspace_size_bytes < data.workspace_size_bytes ||
       !make_range(workspace.workspace_base, data.workspace_size_bytes, range) ||
+      !make_range(&workspace, sizeof(workspace), descriptor) || ranges_overlap(range, descriptor) ||
       workspace.plan_identity != &data ||
       !exact_pointer(workspace.workspace_base, data.residual_scratch_offset_bytes,
                      workspace.residual) ||
@@ -259,34 +242,37 @@ generativeqc_xtb_status_t validate_workspace(const SccMixerPlan& plan, const Scc
       !exact_pointer(workspace.workspace_base, data.history_slot_scratch_offset_bytes,
                      workspace.history_slots)) {
     error = "SCC mixer scratch is malformed or belongs to a different plan";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_vector(const SccMixerPlan& plan, const SccMixerVectorView& vector,
-                                 std::string& error) {
-  const SccMixerPlanData& data = *plan.identity();
+BroydenResult validate_vector(const BroydenPlan& plan, const BroydenVectorView& vector,
+                              std::string& error) {
+  const BroydenPlanData& data = *plan.identity();
   AddressRange range;
+  if (!is_aligned(vector.workspace_base, data.workspace_alignment) ||
+      vector.workspace_size_bytes < data.vector_workspace_size_bytes ||
+      !make_range(vector.workspace_base, data.vector_workspace_size_bytes, range)) {
+    error = "SCC mixer vector is not the canonical binding sealed by its plan";
+    return BroydenResult::invalid_argument;
+  }
   bool exact_fields = vector.field_count == data.field_count;
   for (std::size_t field = 0u; exact_fields && field < data.field_count; ++field) {
     exact_fields =
         exact_pointer(vector.workspace_base, data.field_offset_bytes[field], vector.fields[field]);
   }
-  if (!is_aligned(vector.workspace_base, data.workspace_alignment) ||
-      vector.workspace_size_bytes < data.vector_workspace_size_bytes ||
-      !make_range(vector.workspace_base, data.vector_workspace_size_bytes, range) ||
-      !exact_fields) {
+  if (!exact_fields) {
     error = "SCC mixer vector is not the canonical binding sealed by its plan";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_active_ranges(const SccMixerPlan& plan, const SccMixerVectorView& vector,
-                                        const SccMixerState& state,
-                                        const SccMixerWorkspace* workspace, std::string& error) {
-  const SccMixerPlanData& data = *plan.identity();
+BroydenResult validate_active_ranges(const BroydenPlan& plan, const BroydenVectorView& vector,
+                                     const BroydenState& state, const BroydenWorkspace* workspace,
+                                     std::string& error) {
+  const BroydenPlanData& data = *plan.identity();
   AddressRange vector_range;
   AddressRange state_range;
   AddressRange plan_descriptor;
@@ -302,7 +288,7 @@ generativeqc_xtb_status_t validate_active_ranges(const SccMixerPlan& plan, const
       ranges_overlap(vector_range, state_range) || overlaps_plan_storage(plan, vector_range) ||
       overlaps_plan_storage(plan, state_range)) {
     error = "SCC mixer vector, state, plan, and descriptors must not overlap";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::array<AddressRange, 4> controls{
       {plan_descriptor, vector_descriptor, state_descriptor, error_descriptor}};
@@ -310,7 +296,7 @@ generativeqc_xtb_status_t validate_active_ranges(const SccMixerPlan& plan, const
     for (const AddressRange& control : controls) {
       if (ranges_overlap(active, control)) {
         error = "SCC mixer numerical storage overlaps a control object";
-        return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+        return BroydenResult::invalid_argument;
       }
     }
   }
@@ -326,40 +312,41 @@ generativeqc_xtb_status_t validate_active_ranges(const SccMixerPlan& plan, const
         ranges_overlap(workspace_range, vector_descriptor) ||
         ranges_overlap(workspace_range, state_descriptor) ||
         ranges_overlap(workspace_range, error_descriptor) ||
+        ranges_overlap(workspace_range, workspace_descriptor) ||
         ranges_overlap(vector_range, workspace_descriptor) ||
         ranges_overlap(state_range, workspace_descriptor)) {
       error = "SCC mixer scratch overlaps active numerical or control storage";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_call(const SccMixerPlan& plan, const SccMixerVectorView& vector,
-                               const SccMixerState& state, const SccMixerWorkspace* workspace,
-                               std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS ||
-      (status = validate_state(plan, state, error)) != GENERATIVEQC_XTB_STATUS_SUCCESS ||
+BroydenResult validate_call(const BroydenPlan& plan, const BroydenVectorView& vector,
+                            const BroydenState& state, const BroydenWorkspace* workspace,
+                            std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  if (status != BroydenResult::success ||
+      (status = validate_state(plan, state, error)) != BroydenResult::success ||
       (workspace != nullptr &&
-       (status = validate_workspace(plan, *workspace, error)) != GENERATIVEQC_XTB_STATUS_SUCCESS) ||
-      (status = validate_vector(plan, vector, error)) != GENERATIVEQC_XTB_STATUS_SUCCESS ||
+       (status = validate_workspace(plan, *workspace, error)) != BroydenResult::success) ||
+      (status = validate_vector(plan, vector, error)) != BroydenResult::success ||
       (status = validate_active_ranges(plan, vector, state, workspace, error)) !=
-          GENERATIVEQC_XTB_STATUS_SUCCESS) {
+          BroydenResult::success) {
     return status;
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_transaction(const SccMixerPlan& plan, const SccMixerState& source,
-                                      const SccMixerState& staged, std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS ||
-      (status = validate_state(plan, source, error)) != GENERATIVEQC_XTB_STATUS_SUCCESS ||
-      (status = validate_state(plan, staged, error)) != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult validate_transaction(const BroydenPlan& plan, const BroydenState& source,
+                                   const BroydenState& staged, std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  if (status != BroydenResult::success ||
+      (status = validate_state(plan, source, error)) != BroydenResult::success ||
+      (status = validate_state(plan, staged, error)) != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   AddressRange source_range;
   AddressRange staged_range;
   AddressRange plan_descriptor;
@@ -375,7 +362,7 @@ generativeqc_xtb_status_t validate_transaction(const SccMixerPlan& plan, const S
       ranges_overlap(source_range, staged_range) || overlaps_plan_storage(plan, source_range) ||
       overlaps_plan_storage(plan, staged_range)) {
     error = "SCC mixer transaction source and staged storage must be disjoint and unaliased";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::array<AddressRange, 4> controls{
       {plan_descriptor, source_descriptor, staged_descriptor, error_descriptor}};
@@ -383,29 +370,31 @@ generativeqc_xtb_status_t validate_transaction(const SccMixerPlan& plan, const S
     for (const AddressRange& control : controls) {
       if (ranges_overlap(active, control)) {
         error = "SCC mixer transaction storage overlaps a control object";
-        return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+        return BroydenResult::invalid_argument;
       }
     }
   }
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
+// Preserve the incumbent ordered numerical body through ownership changes.
+// clang-format off
 std::size_t system_index(std::int64_t system) { return static_cast<std::size_t>(system); }
 
-std::size_t system_dimension(const SccMixerPlanData& data, std::size_t system) {
+std::size_t system_dimension(const BroydenPlanData& data, std::size_t system) {
   return static_cast<std::size_t>(data.vector_offsets[system + 1u] - data.vector_offsets[system]);
 }
 
-std::size_t system_vector_offset(const SccMixerPlanData& data, std::size_t system) {
+std::size_t system_vector_offset(const BroydenPlanData& data, std::size_t system) {
   return static_cast<std::size_t>(data.vector_offsets[system]);
 }
 
-std::size_t system_history_offset(const SccMixerPlanData& data, std::size_t system) {
+std::size_t system_history_offset(const BroydenPlanData& data, std::size_t system) {
   return static_cast<std::size_t>(data.history_offsets[system]);
 }
 
 template <typename Function>
-void for_each_raw_component(const SccMixerPlanData& data, const SccMixerVectorView& vector,
+void for_each_raw_component(const BroydenPlanData& data, const BroydenVectorView& vector,
                             std::size_t system, Function&& function) {
   std::size_t packed = 0u;
   for (std::size_t field = 0u; field < data.field_count; ++field) {
@@ -417,7 +406,7 @@ void for_each_raw_component(const SccMixerPlanData& data, const SccMixerVectorVi
   }
 }
 
-void publish_mixed_components(const SccMixerPlanData& data, const SccMixerVectorView& vector,
+void publish_mixed_components(const BroydenPlanData& data, const BroydenVectorView& vector,
                               std::size_t system, const double* mixed) {
   std::size_t packed = 0u;
   for (std::size_t field = 0u; field < data.field_count; ++field) {
@@ -429,7 +418,7 @@ void publish_mixed_components(const SccMixerPlanData& data, const SccMixerVector
   }
 }
 
-bool raw_components_are_finite(const SccMixerPlanData& data, const SccMixerVectorView& wavefunction,
+bool raw_components_are_finite(const BroydenPlanData& data, const BroydenVectorView& wavefunction,
                                std::size_t system) {
   bool finite = true;
   for_each_raw_component(data, wavefunction, system, [&](std::size_t, double value) {
@@ -438,7 +427,7 @@ bool raw_components_are_finite(const SccMixerPlanData& data, const SccMixerVecto
   return finite;
 }
 
-void copy_raw_components(const SccMixerPlanData& data, const SccMixerVectorView& wavefunction,
+void copy_raw_components(const BroydenPlanData& data, const BroydenVectorView& wavefunction,
                          std::size_t system, double* destination) {
   for_each_raw_component(data, wavefunction, system,
                          [&](std::size_t packed, double value) { destination[packed] = value; });
@@ -451,8 +440,8 @@ void copy_raw_components(const SccMixerPlanData& data, const SccMixerVectorView&
  * lets a per-system transaction cost scale with active-system history instead
  * of the total batch history.
  */
-void copy_mixer_system_state(const SccMixerPlanData& data, std::size_t system,
-                             const SccMixerState& source, const SccMixerState& destination) {
+void copy_mixer_system_state(const BroydenPlanData& data, std::size_t system,
+                             const BroydenState& source, const BroydenState& destination) {
   const std::size_t dimension = system_dimension(data, system);
   const std::size_t vector_offset = system_vector_offset(data, system);
   const std::size_t history_offset = system_history_offset(data, system);
@@ -478,84 +467,21 @@ void copy_mixer_system_state(const SccMixerPlanData& data, std::size_t system,
   destination.converged[system] = source.converged[system];
 }
 
-generativeqc_xtb_status_t record_numeric_failure(const SccMixerState& state, std::size_t system,
+BroydenResult record_numeric_failure(const BroydenState& state, std::size_t system,
                                         const char* message, std::string& error) {
   /* Preserve every numerical diagnostic and history field. A failed raw SCC
    * result is observable only through the per-system status and error text. */
-  state.system_statuses[system] = GENERATIVEQC_XTB_STATUS_INTERNAL_ERROR;
+  state.system_statuses[system] = state.status_encoding.numerical_failure;
   error = message;
-  return GENERATIVEQC_XTB_STATUS_INTERNAL_ERROR;
+  return BroydenResult::numerical_failure;
 }
 
-bool dot_product(const double* first, const double* second, std::size_t count, double& result) {
-  double sum = 0.0;
-  for (std::size_t index = 0u; index < count; ++index) {
-    sum += first[index] * second[index];
-    if (!std::isfinite(sum)) {
-      return false;
-    }
-  }
-  result = sum;
-  return true;
-}
+#include "generated_broyden_cpu_helpers.inc"
 
-bool cholesky_solve(double* matrix, double* right_hand_side, std::size_t dimension) {
-  /* beta is symmetric positive definite because omega0^2 is added to I. */
-  for (std::size_t row = 0u; row < dimension; ++row) {
-    for (std::size_t column = 0u; column <= row; ++column) {
-      double value = matrix[row * dimension + column];
-      for (std::size_t inner = 0u; inner < column; ++inner) {
-        value -= matrix[row * dimension + inner] * matrix[column * dimension + inner];
-      }
-      if (!std::isfinite(value)) {
-        return false;
-      }
-      if (row == column) {
-        if (!(value > 0.0)) {
-          return false;
-        }
-        matrix[row * dimension + column] = std::sqrt(value);
-      } else {
-        const double diagonal = matrix[column * dimension + column];
-        value /= diagonal;
-        if (!std::isfinite(value)) {
-          return false;
-        }
-        matrix[row * dimension + column] = value;
-      }
-    }
-  }
-
-  for (std::size_t row = 0u; row < dimension; ++row) {
-    double value = right_hand_side[row];
-    for (std::size_t column = 0u; column < row; ++column) {
-      value -= matrix[row * dimension + column] * right_hand_side[column];
-    }
-    value /= matrix[row * dimension + row];
-    if (!std::isfinite(value)) {
-      return false;
-    }
-    right_hand_side[row] = value;
-  }
-  for (std::size_t reverse = dimension; reverse > 0u; --reverse) {
-    const std::size_t row = reverse - 1u;
-    double value = right_hand_side[row];
-    for (std::size_t column = row + 1u; column < dimension; ++column) {
-      value -= matrix[column * dimension + row] * right_hand_side[column];
-    }
-    value /= matrix[row * dimension + row];
-    if (!std::isfinite(value)) {
-      return false;
-    }
-    right_hand_side[row] = value;
-  }
-  return true;
-}
-
-generativeqc_xtb_status_t mix_system_unchecked(const SccMixerPlanData& data, std::size_t system,
-                                      const SccMixerVectorView& wavefunction,
-                                      const SccMixerState& state,
-                                      const SccMixerWorkspace& workspace, std::string& error) {
+BroydenResult mix_system_unchecked(const BroydenPlanData& data, std::size_t system,
+                                      const BroydenVectorView& wavefunction,
+                                      const BroydenState& state,
+                                      const BroydenWorkspace& workspace, std::string& error) {
   const std::size_t dimension = system_dimension(data, system);
   const std::size_t vector_offset = system_vector_offset(data, system);
   const std::size_t history_offset = system_history_offset(data, system);
@@ -641,81 +567,14 @@ generativeqc_xtb_status_t mix_system_unchecked(const SccMixerPlanData& data, std
       return record_numeric_failure(state, system, "SCC mixer Broyden weight is not finite", error);
     }
 
-    const std::size_t history_count = static_cast<std::size_t>(
-        std::min<std::uint64_t>(static_cast<std::uint64_t>(memory), old_iteration));
-    const std::uint64_t first_iteration =
-        old_iteration - static_cast<std::uint64_t>(history_count) + 1u;
-    const std::size_t new_slot =
-        static_cast<std::size_t>((old_iteration - 1u) % static_cast<std::uint64_t>(memory));
-    for (std::size_t history = 0u; history < history_count; ++history) {
-      const std::uint64_t represented_iteration =
-          first_iteration + static_cast<std::uint64_t>(history);
-      workspace.history_slots[history] = static_cast<std::int64_t>(
-          (represented_iteration - 1u) % static_cast<std::uint64_t>(memory));
-    }
+#include "generated_broyden_cpu_window.inc"
 
-    const auto df_vector = [&](std::size_t slot) {
-      return slot == new_slot ? workspace.delta_f
-                              : state.df_history + history_offset + slot * dimension;
-    };
-    const auto u_vector = [&](std::size_t slot) {
-      return slot == new_slot ? workspace.new_u
-                              : state.u_history + history_offset + slot * dimension;
-    };
-    const auto slot_omega = [&](std::size_t slot) {
-      return slot == new_slot ? omega : state.omega[system * memory + slot];
-    };
-
-    for (std::size_t row = 0u; row < history_count; ++row) {
-      const std::size_t row_slot = static_cast<std::size_t>(workspace.history_slots[row]);
-      const double row_omega = slot_omega(row_slot);
-      double coefficient_dot = 0.0;
-      if (!std::isfinite(row_omega) ||
-          !dot_product(df_vector(row_slot), workspace.residual, dimension, coefficient_dot)) {
-        return record_numeric_failure(state, system, "SCC mixer Broyden coefficient is not finite",
-                                      error);
-      }
-      workspace.coefficients[row] = row_omega * coefficient_dot;
-      if (!std::isfinite(workspace.coefficients[row])) {
-        return record_numeric_failure(state, system, "SCC mixer Broyden coefficient overflowed",
-                                      error);
-      }
-      for (std::size_t column = 0u; column < history_count; ++column) {
-        const std::size_t column_slot = static_cast<std::size_t>(workspace.history_slots[column]);
-        const double column_omega = slot_omega(column_slot);
-        double overlap = 0.0;
-        if (!std::isfinite(column_omega) ||
-            !dot_product(df_vector(row_slot), df_vector(column_slot), dimension, overlap)) {
-          return record_numeric_failure(state, system,
-                                        "SCC mixer Broyden history overlap is not finite", error);
-        }
-        double value = row_omega * column_omega * overlap;
-        if (row == column) {
-          value += kOmegaZero * kOmegaZero;
-        }
-        if (!std::isfinite(value)) {
-          return record_numeric_failure(state, system, "SCC mixer Broyden matrix overflowed",
-                                        error);
-        }
-        workspace.beta[row * history_count + column] = value;
-      }
-    }
+#include "generated_broyden_cpu_gram.inc"
     if (!cholesky_solve(workspace.beta, workspace.coefficients, history_count)) {
       return record_numeric_failure(state, system, "SCC mixer Broyden system is not usable", error);
     }
 
-    for (std::size_t component = 0u; component < dimension; ++component) {
-      double value = current[component] + data.damping * workspace.residual[component];
-      for (std::size_t history = 0u; history < history_count; ++history) {
-        const std::size_t slot = static_cast<std::size_t>(workspace.history_slots[history]);
-        value -= slot_omega(slot) * workspace.coefficients[history] * u_vector(slot)[component];
-      }
-      if (!std::isfinite(value)) {
-        return record_numeric_failure(state, system, "SCC mixer Broyden result is not finite",
-                                      error);
-      }
-      workspace.mixed[component] = value;
-    }
+#include "generated_broyden_cpu_correction.inc"
 
     std::copy_n(workspace.delta_f, dimension,
                 state.df_history + history_offset + new_slot * dimension);
@@ -732,55 +591,56 @@ generativeqc_xtb_status_t mix_system_unchecked(const SccMixerPlanData& data, std
   state.residual_rms[system] = residual_rms;
   state.residual_maximum[system] = residual_maximum;
   state.iterations[system] = new_iteration;
-  state.system_statuses[system] = GENERATIVEQC_XTB_STATUS_SUCCESS;
+  state.system_statuses[system] = state.status_encoding.success;
   state.converged[system] =
       residual_rms < data.rms_tolerance && residual_maximum < data.maximum_tolerance ? 1u : 0u;
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
+// clang-format on
 
 }  // namespace
 
-SccMixerPlan::SccMixerPlan(std::shared_ptr<const SccMixerPlanData> data) noexcept
+BroydenPlan::BroydenPlan(std::shared_ptr<const BroydenPlanData> data) noexcept
     : data_(std::move(data)) {}
 
-bool SccMixerPlan::sealed() const noexcept { return data_ != nullptr; }
+bool BroydenPlan::sealed() const noexcept { return data_ != nullptr; }
 
-std::int64_t SccMixerPlan::batch_size() const noexcept {
+std::int64_t BroydenPlan::batch_size() const noexcept {
   return data_ == nullptr ? 0 : data_->batch_size;
 }
 
-std::int64_t SccMixerPlan::history_size() const noexcept {
+std::int64_t BroydenPlan::history_size() const noexcept {
   return data_ == nullptr ? 0 : data_->history_size;
 }
 
-std::int64_t SccMixerPlan::total_vector_elements() const noexcept {
+std::int64_t BroydenPlan::total_vector_elements() const noexcept {
   return data_ == nullptr ? 0 : data_->total_vector_elements;
 }
 
-std::int64_t SccMixerPlan::maximum_vector_elements() const noexcept {
+std::int64_t BroydenPlan::maximum_vector_elements() const noexcept {
   return data_ == nullptr ? 0 : data_->maximum_vector_elements;
 }
 
-double SccMixerPlan::damping() const noexcept { return data_ == nullptr ? 0.0 : data_->damping; }
+double BroydenPlan::damping() const noexcept { return data_ == nullptr ? 0.0 : data_->damping; }
 
-double SccMixerPlan::rms_tolerance() const noexcept {
+double BroydenPlan::rms_tolerance() const noexcept {
   return data_ == nullptr ? 0.0 : data_->rms_tolerance;
 }
 
-double SccMixerPlan::maximum_tolerance() const noexcept {
+double BroydenPlan::maximum_tolerance() const noexcept {
   return data_ == nullptr ? 0.0 : data_->maximum_tolerance;
 }
 
-std::size_t SccMixerPlan::state_size_bytes() const noexcept {
+std::size_t BroydenPlan::state_size_bytes() const noexcept {
   return data_ == nullptr ? 0u : data_->state_size_bytes;
 }
 
-std::size_t SccMixerPlan::workspace_size_bytes() const noexcept {
+std::size_t BroydenPlan::workspace_size_bytes() const noexcept {
   return data_ == nullptr ? 0u : data_->workspace_size_bytes;
 }
 
-std::size_t SccMixerPlan::resident_bytes() const noexcept {
+std::size_t BroydenPlan::resident_bytes() const noexcept {
   if (data_ == nullptr) {
     return 0u;
   }
@@ -792,12 +652,12 @@ std::size_t SccMixerPlan::resident_bytes() const noexcept {
   return bytes;
 }
 
-const std::vector<std::int64_t>& SccMixerPlan::vector_offsets() const noexcept {
+const std::vector<std::int64_t>& BroydenPlan::vector_offsets() const noexcept {
   static const std::vector<std::int64_t> empty;
   return data_ == nullptr ? empty : data_->vector_offsets;
 }
 
-bool SccMixerPlan::matches_vector_layout(const SccMixerVectorLayoutView& layout) const noexcept {
+bool BroydenPlan::matches_vector_layout(const BroydenVectorLayoutView& layout) const noexcept {
   if (data_ == nullptr || data_->batch_size != layout.batch_size ||
       data_->vector_workspace_size_bytes != layout.workspace_size_bytes ||
       data_->workspace_alignment != layout.workspace_alignment ||
@@ -805,9 +665,11 @@ bool SccMixerPlan::matches_vector_layout(const SccMixerVectorLayoutView& layout)
     return false;
   }
   for (std::size_t field = 0u; field < data_->field_count; ++field) {
-    const SccMixerFieldLayoutView& candidate = layout.fields[field];
+    const BroydenFieldLayoutView& candidate = layout.fields[field];
     if (data_->field_offset_bytes[field] != candidate.offset_bytes ||
         data_->field_size_bytes[field] != candidate.size_bytes ||
+        candidate.element_count !=
+            static_cast<std::int64_t>(data_->field_size_bytes[field] / sizeof(double)) ||
         candidate.system_offsets == nullptr ||
         candidate.system_offset_count != data_->field_system_offsets[field].size() ||
         !std::equal(data_->field_system_offsets[field].begin(),
@@ -818,44 +680,46 @@ bool SccMixerPlan::matches_vector_layout(const SccMixerVectorLayoutView& layout)
   return true;
 }
 
-bool SccMixerPlan::overlaps_storage(const void* data, std::size_t size_bytes) const noexcept {
+bool BroydenPlan::overlaps_storage(const void* data, std::size_t size_bytes) const noexcept {
   AddressRange range;
   return size_bytes != 0u && (data_ == nullptr || !make_range(data, size_bytes, range) ||
                               overlaps_plan_storage(*this, range));
 }
 
-const SccMixerPlanData* SccMixerPlan::identity() const noexcept { return data_.get(); }
+const BroydenPlanData* BroydenPlan::identity() const noexcept { return data_.get(); }
 
-generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& layout,
-                                     std::int64_t history_size, double damping,
-                                     double rms_tolerance, double maximum_tolerance,
-                                     SccMixerPlan& plan, std::string& error) {
+BroydenResult make_broyden_plan(const BroydenVectorLayoutView& layout, const BroydenPolicy& policy,
+                                BroydenStatusEncoding status_encoding, BroydenPlan& plan,
+                                std::string& error) {
+  const auto history_size = policy.history_size;
+  const auto damping = policy.damping;
+  const auto rms_tolerance = policy.rms_tolerance;
+  const auto maximum_tolerance = policy.maximum_tolerance;
   if (layout.batch_size <= 0 || layout.workspace_size_bytes == 0u ||
-      layout.workspace_alignment == 0u ||
+      layout.workspace_alignment < alignof(double) ||
       (layout.workspace_alignment & (layout.workspace_alignment - 1u)) != 0u ||
-      layout.field_count == 0u || layout.field_count > kSccMixerMaximumFields ||
-      history_size <= 0 || !std::isfinite(damping) || !(damping > 0.0) || damping > 1.0 ||
-      !std::isfinite(rms_tolerance) || !(rms_tolerance > 0.0) ||
-      !std::isfinite(maximum_tolerance) || !(maximum_tolerance > 0.0)) {
+      layout.field_count == 0u || layout.field_count > kBroydenMaximumFields || !policy.valid() ||
+      !status_encoding.valid()) {
     error = "SCC mixer vector layout, history, damping, or convergence tolerances are invalid";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
 
   const std::size_t batch = static_cast<std::size_t>(layout.batch_size);
-  std::array<AddressRange, kSccMixerMaximumFields> field_ranges{};
+  std::array<AddressRange, kBroydenMaximumFields> field_ranges{};
   for (std::size_t field = 0u; field < layout.field_count; ++field) {
-    const SccMixerFieldLayoutView& candidate = layout.fields[field];
+    const BroydenFieldLayoutView& candidate = layout.fields[field];
     std::size_t expected_size = 0u;
-    if (candidate.element_count <= 0 || candidate.system_offsets == nullptr ||
-        candidate.system_offset_count != batch + 1u || candidate.system_offsets[0] != 0 ||
+    if (candidate.element_count <= 0 || candidate.offset_bytes % alignof(double) != 0u ||
+        candidate.system_offsets == nullptr || candidate.system_offset_count != batch + 1u ||
+        candidate.system_offsets[0] != 0 ||
         candidate.system_offsets[batch] != candidate.element_count ||
         !checked_multiply(static_cast<std::size_t>(candidate.element_count), sizeof(double),
-                               expected_size) ||
+                          expected_size) ||
         expected_size != candidate.size_bytes ||
         candidate.offset_bytes > layout.workspace_size_bytes ||
         candidate.size_bytes > layout.workspace_size_bytes - candidate.offset_bytes) {
       error = "SCC mixer vector field layout is malformed or exceeds its workspace";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
     field_ranges[field] = {
         static_cast<std::uintptr_t>(candidate.offset_bytes),
@@ -864,7 +728,7 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
       if (candidate.system_offsets[system] < 0 ||
           candidate.system_offsets[system] >= candidate.system_offsets[system + 1u]) {
         error = "SCC mixer vector field offsets must give every system a nonempty slice";
-        return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+        return BroydenResult::invalid_argument;
       }
     }
   }
@@ -872,13 +736,14 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
     for (std::size_t second = first + 1u; second < layout.field_count; ++second) {
       if (ranges_overlap(field_ranges[first], field_ranges[second])) {
         error = "SCC mixer vector fields overlap within their model workspace";
-        return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+        return BroydenResult::invalid_argument;
       }
     }
   }
 
   try {
-    SccMixerPlanData created;
+    BroydenPlanData created;
+    created.status_encoding = status_encoding;
     created.batch_size = layout.batch_size;
     created.history_size = history_size;
     created.damping = damping;
@@ -888,7 +753,7 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
     created.workspace_alignment = layout.workspace_alignment;
     created.field_count = layout.field_count;
     for (std::size_t field = 0u; field < layout.field_count; ++field) {
-      const SccMixerFieldLayoutView& candidate = layout.fields[field];
+      const BroydenFieldLayoutView& candidate = layout.fields[field];
       created.field_offset_bytes[field] = candidate.offset_bytes;
       created.field_size_bytes[field] = candidate.size_bytes;
       created.field_system_offsets[field].assign(
@@ -905,7 +770,7 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
                                             created.field_system_offsets[field][system];
         if (!checked_add_i64(field_elements, dimension)) {
           error = "SCC mixer ragged vector dimensions overflow int64_t";
-          return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+          return BroydenResult::invalid_argument;
         }
       }
       if (dimension <= 0 || !checked_multiply_i64(dimension, history_size, history_elements) ||
@@ -914,15 +779,14 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
           !checked_add_i64(history_elements, created.history_offsets[system + 1u]) ||
           !checked_add_i64(created.history_offsets[system], created.history_offsets[system + 1u])) {
         error = "SCC mixer ragged vector or history dimensions overflow int64_t";
-        return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+        return BroydenResult::invalid_argument;
       }
       created.maximum_vector_elements = std::max(created.maximum_vector_elements, dimension);
     }
     created.total_vector_elements = created.vector_offsets.back();
 
     const auto bytes_for = [&](std::int64_t count, std::size_t element_size, std::size_t& bytes) {
-      return count >= 0 &&
-             checked_multiply(static_cast<std::size_t>(count), element_size, bytes) &&
+      return count >= 0 && checked_multiply(static_cast<std::size_t>(count), element_size, bytes) &&
              static_cast<std::uint64_t>(count) <=
                  static_cast<std::uint64_t>(std::numeric_limits<std::ptrdiff_t>::max());
     };
@@ -931,7 +795,7 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
     if (!checked_multiply_i64(layout.batch_size, history_size, omega_elements) ||
         !checked_multiply_i64(history_size, history_size, beta_elements)) {
       error = "SCC mixer history dimensions overflow int64_t";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
     const std::int64_t total_history_elements = created.history_offsets.back();
     std::size_t vector_bytes = 0u;
@@ -950,87 +814,87 @@ generativeqc_xtb_status_t make_scc_mixer_plan(const SccMixerVectorLayoutView& la
         !bytes_for(omega_elements, sizeof(double), omega_bytes) ||
         !bytes_for(layout.batch_size, sizeof(double), batch_double_bytes) ||
         !bytes_for(layout.batch_size, sizeof(std::uint64_t), batch_u64_bytes) ||
-        !bytes_for(layout.batch_size, sizeof(generativeqc_xtb_status_t), batch_status_bytes) ||
+        !bytes_for(layout.batch_size, sizeof(std::int32_t), batch_status_bytes) ||
         !bytes_for(layout.batch_size, sizeof(std::uint8_t), batch_byte_bytes) ||
         !bytes_for(created.maximum_vector_elements, sizeof(double), maximum_vector_bytes) ||
         !bytes_for(beta_elements, sizeof(double), beta_bytes) ||
         !bytes_for(history_size, sizeof(double), coefficient_bytes) ||
         !bytes_for(history_size, sizeof(std::int64_t), slot_bytes)) {
       error = "SCC mixer caller-owned storage exceeds addressable memory";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
 
-    std::size_t cursor = 0u;
-    if (!append_segment(vector_bytes, alignof(double), cursor,
-                        created.current_input_offset_bytes) ||
-        !append_segment(vector_bytes, alignof(double), cursor,
-                        created.previous_input_offset_bytes) ||
-        !append_segment(vector_bytes, alignof(double), cursor,
-                        created.previous_residual_offset_bytes) ||
-        !append_segment(history_bytes, alignof(double), cursor, created.df_history_offset_bytes) ||
-        !append_segment(history_bytes, alignof(double), cursor, created.u_history_offset_bytes) ||
-        !append_segment(omega_bytes, alignof(double), cursor, created.omega_offset_bytes) ||
-        !append_segment(batch_double_bytes, alignof(double), cursor,
-                        created.residual_rms_offset_bytes) ||
-        !append_segment(batch_double_bytes, alignof(double), cursor,
-                        created.residual_maximum_offset_bytes) ||
-        !append_segment(batch_u64_bytes, alignof(std::uint64_t), cursor,
-                        created.iteration_offset_bytes) ||
-        !append_segment(batch_u64_bytes, alignof(std::uint64_t), cursor,
-                        created.restart_count_offset_bytes) ||
-        !append_segment(batch_status_bytes, alignof(generativeqc_xtb_status_t), cursor,
-                        created.system_status_offset_bytes) ||
-        !append_segment(batch_byte_bytes, alignof(std::uint8_t), cursor,
-                        created.initialized_offset_bytes) ||
-        !append_segment(batch_byte_bytes, alignof(std::uint8_t), cursor,
-                        created.converged_offset_bytes) ||
-        !align_up(cursor, kSccMixerWorkspaceAlignment, created.state_size_bytes)) {
+    ::generativeqc::runtime::WorkspaceLayout packing;
+    if (!packing.append_bytes(vector_bytes, alignof(double), created.current_input_offset_bytes) ||
+        !packing.append_bytes(vector_bytes, alignof(double), created.previous_input_offset_bytes) ||
+        !packing.append_bytes(vector_bytes, alignof(double),
+                              created.previous_residual_offset_bytes) ||
+        !packing.append_bytes(history_bytes, alignof(double), created.df_history_offset_bytes) ||
+        !packing.append_bytes(history_bytes, alignof(double), created.u_history_offset_bytes) ||
+        !packing.append_bytes(omega_bytes, alignof(double), created.omega_offset_bytes) ||
+        !packing.append_bytes(batch_double_bytes, alignof(double),
+                              created.residual_rms_offset_bytes) ||
+        !packing.append_bytes(batch_double_bytes, alignof(double),
+                              created.residual_maximum_offset_bytes) ||
+        !packing.append_bytes(batch_u64_bytes, alignof(std::uint64_t),
+                              created.iteration_offset_bytes) ||
+        !packing.append_bytes(batch_u64_bytes, alignof(std::uint64_t),
+                              created.restart_count_offset_bytes) ||
+        !packing.append_bytes(batch_status_bytes, alignof(std::int32_t),
+                              created.system_status_offset_bytes) ||
+        !packing.append_bytes(batch_byte_bytes, alignof(std::uint8_t),
+                              created.initialized_offset_bytes) ||
+        !packing.append_bytes(batch_byte_bytes, alignof(std::uint8_t),
+                              created.converged_offset_bytes) ||
+        !::generativeqc::runtime::checked_align_up(packing.bytes(), kBroydenWorkspaceAlignment,
+                                                   created.state_size_bytes)) {
       error = "SCC mixer persistent state packing overflows size_t";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
 
-    cursor = 0u;
-    if (!append_segment(maximum_vector_bytes, alignof(double), cursor,
-                        created.residual_scratch_offset_bytes) ||
-        !append_segment(maximum_vector_bytes, alignof(double), cursor,
-                        created.mixed_scratch_offset_bytes) ||
-        !append_segment(maximum_vector_bytes, alignof(double), cursor,
-                        created.delta_f_scratch_offset_bytes) ||
-        !append_segment(maximum_vector_bytes, alignof(double), cursor,
-                        created.new_u_scratch_offset_bytes) ||
-        !append_segment(beta_bytes, alignof(double), cursor, created.beta_scratch_offset_bytes) ||
-        !append_segment(coefficient_bytes, alignof(double), cursor,
-                        created.coefficient_scratch_offset_bytes) ||
-        !append_segment(slot_bytes, alignof(std::int64_t), cursor,
-                        created.history_slot_scratch_offset_bytes) ||
-        !align_up(cursor, kSccMixerWorkspaceAlignment, created.workspace_size_bytes)) {
+    packing = {};
+    if (!packing.append_bytes(maximum_vector_bytes, alignof(double),
+                              created.residual_scratch_offset_bytes) ||
+        !packing.append_bytes(maximum_vector_bytes, alignof(double),
+                              created.mixed_scratch_offset_bytes) ||
+        !packing.append_bytes(maximum_vector_bytes, alignof(double),
+                              created.delta_f_scratch_offset_bytes) ||
+        !packing.append_bytes(maximum_vector_bytes, alignof(double),
+                              created.new_u_scratch_offset_bytes) ||
+        !packing.append_bytes(beta_bytes, alignof(double), created.beta_scratch_offset_bytes) ||
+        !packing.append_bytes(coefficient_bytes, alignof(double),
+                              created.coefficient_scratch_offset_bytes) ||
+        !packing.append_bytes(slot_bytes, alignof(std::int64_t),
+                              created.history_slot_scratch_offset_bytes) ||
+        !::generativeqc::runtime::checked_align_up(packing.bytes(), kBroydenWorkspaceAlignment,
+                                                   created.workspace_size_bytes)) {
       error = "SCC mixer scratch packing overflows size_t";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
 
-    auto sealed = std::make_shared<const SccMixerPlanData>(std::move(created));
-    plan = SccMixerPlan(std::move(sealed));
+    auto sealed = std::make_shared<const BroydenPlanData>(std::move(created));
+    plan = BroydenPlan(std::move(sealed));
     error.clear();
-    return GENERATIVEQC_XTB_STATUS_SUCCESS;
+    return BroydenResult::success;
   } catch (const std::bad_alloc&) {
     error = "failed to allocate SCC mixer plan metadata";
-    return GENERATIVEQC_XTB_STATUS_ALLOCATION_FAILED;
+    return BroydenResult::allocation_failed;
   }
 }
 
-generativeqc_xtb_status_t bind_scc_mixer_state(const SccMixerPlan& plan, void* workspace,
-                                      std::size_t workspace_size, SccMixerState& state,
-                                      std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult bind_broyden_state(const BroydenPlan& plan, void* workspace,
+                                 std::size_t workspace_size, BroydenState& state,
+                                 std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   AddressRange workspace_range;
   AddressRange plan_descriptor;
   AddressRange state_descriptor;
   AddressRange error_descriptor;
-  if (!is_aligned(workspace, kSccMixerWorkspaceAlignment) ||
+  if (!is_aligned(workspace, kBroydenWorkspaceAlignment) ||
       workspace_size < data.state_size_bytes ||
       !make_range(workspace, data.state_size_bytes, workspace_range) ||
       !make_range(&plan, sizeof(plan), plan_descriptor) ||
@@ -1041,10 +905,10 @@ generativeqc_xtb_status_t bind_scc_mixer_state(const SccMixerPlan& plan, void* w
       ranges_overlap(workspace_range, state_descriptor) ||
       ranges_overlap(workspace_range, error_descriptor)) {
     error = "SCC mixer persistent state storage is invalid or overlaps control storage";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
 
-  SccMixerState created;
+  BroydenState created;
   created.workspace_base = workspace;
   created.workspace_size_bytes = workspace_size;
   created.current_inputs = offset_pointer<double>(workspace, data.current_input_offset_bytes);
@@ -1060,32 +924,33 @@ generativeqc_xtb_status_t bind_scc_mixer_state(const SccMixerPlan& plan, void* w
   created.restart_counts =
       offset_pointer<std::uint64_t>(workspace, data.restart_count_offset_bytes);
   created.system_statuses =
-      offset_pointer<generativeqc_xtb_status_t>(workspace, data.system_status_offset_bytes);
+      offset_pointer<std::int32_t>(workspace, data.system_status_offset_bytes);
   created.initialized = offset_pointer<std::uint8_t>(workspace, data.initialized_offset_bytes);
   created.converged = offset_pointer<std::uint8_t>(workspace, data.converged_offset_bytes);
   created.plan_identity = &data;
+  created.status_encoding = data.status_encoding;
 
   std::memset(workspace, 0, data.state_size_bytes);
   std::fill_n(created.system_statuses, static_cast<std::size_t>(data.batch_size),
-              GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT);
+              data.status_encoding.uninitialized);
   state = created;
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t bind_scc_mixer_workspace(const SccMixerPlan& plan, void* workspace,
-                                          std::size_t workspace_size, SccMixerWorkspace& view,
-                                          std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult bind_broyden_workspace(const BroydenPlan& plan, void* workspace,
+                                     std::size_t workspace_size, BroydenWorkspace& view,
+                                     std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   AddressRange workspace_range;
   AddressRange plan_descriptor;
   AddressRange view_descriptor;
   AddressRange error_descriptor;
-  if (!is_aligned(workspace, kSccMixerWorkspaceAlignment) ||
+  if (!is_aligned(workspace, kBroydenWorkspaceAlignment) ||
       workspace_size < data.workspace_size_bytes ||
       !make_range(workspace, data.workspace_size_bytes, workspace_range) ||
       !make_range(&plan, sizeof(plan), plan_descriptor) ||
@@ -1096,10 +961,10 @@ generativeqc_xtb_status_t bind_scc_mixer_workspace(const SccMixerPlan& plan, voi
       ranges_overlap(workspace_range, view_descriptor) ||
       ranges_overlap(workspace_range, error_descriptor)) {
     error = "SCC mixer scratch storage is invalid or overlaps control storage";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
 
-  SccMixerWorkspace created;
+  BroydenWorkspace created;
   created.workspace_base = workspace;
   created.workspace_size_bytes = workspace_size;
   created.residual = offset_pointer<double>(workspace, data.residual_scratch_offset_bytes);
@@ -1113,35 +978,35 @@ generativeqc_xtb_status_t bind_scc_mixer_workspace(const SccMixerPlan& plan, voi
   created.plan_identity = &data;
   view = created;
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t validate_scc_mixer_state_binding(const SccMixerPlan& plan,
-                                                  const SccMixerState& state, std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  return status == GENERATIVEQC_XTB_STATUS_SUCCESS ? validate_state(plan, state, error) : status;
+BroydenResult validate_broyden_state_binding(const BroydenPlan& plan, const BroydenState& state,
+                                             std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  return status == BroydenResult::success ? validate_state(plan, state, error) : status;
 }
 
-generativeqc_xtb_status_t validate_scc_mixer_workspace_binding(const SccMixerPlan& plan,
-                                                      const SccMixerWorkspace& workspace,
-                                                      std::string& error) {
-  generativeqc_xtb_status_t status = validate_plan(plan, error);
-  return status == GENERATIVEQC_XTB_STATUS_SUCCESS ? validate_workspace(plan, workspace, error) : status;
+BroydenResult validate_broyden_workspace_binding(const BroydenPlan& plan,
+                                                 const BroydenWorkspace& workspace,
+                                                 std::string& error) {
+  BroydenResult status = validate_plan(plan, error);
+  return status == BroydenResult::success ? validate_workspace(plan, workspace, error) : status;
 }
 
-generativeqc_xtb_status_t initialize_scc_mixer_state_cpu(const SccMixerPlan& plan,
-                                                const SccMixerVectorView& wavefunction,
-                                                const SccMixerState& state, std::string& error) {
-  generativeqc_xtb_status_t status = validate_call(plan, wavefunction, state, nullptr, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult initialize_broyden_state(const BroydenPlan& plan,
+                                       const BroydenVectorView& wavefunction,
+                                       const BroydenState& state, std::string& error) {
+  BroydenResult status = validate_call(plan, wavefunction, state, nullptr, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   const std::size_t batch = static_cast<std::size_t>(data.batch_size);
   for (std::size_t system = 0u; system < batch; ++system) {
     if (!raw_components_are_finite(data, wavefunction, system)) {
       error = "SCC mixer initial wavefunction contains NaN or infinity";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
   }
 
@@ -1150,36 +1015,36 @@ generativeqc_xtb_status_t initialize_scc_mixer_state_cpu(const SccMixerPlan& pla
     copy_raw_components(data, wavefunction, system,
                         state.current_inputs + system_vector_offset(data, system));
     state.initialized[system] = 1u;
-    state.system_statuses[system] = GENERATIVEQC_XTB_STATUS_SUCCESS;
+    state.system_statuses[system] = state.status_encoding.success;
   }
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t restart_scc_mixer_system_cpu(const SccMixerPlan& plan, std::int64_t system,
-                                              const SccMixerVectorView& wavefunction,
-                                              const SccMixerState& state, std::string& error) {
-  generativeqc_xtb_status_t status = validate_call(plan, wavefunction, state, nullptr, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult restart_broyden_system(const BroydenPlan& plan, std::int64_t system,
+                                     const BroydenVectorView& wavefunction,
+                                     const BroydenState& state, std::string& error) {
+  BroydenResult status = validate_call(plan, wavefunction, state, nullptr, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   if (system < 0 || system >= data.batch_size) {
     error = "SCC mixer restart requires a valid system index";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::size_t index = system_index(system);
   if (state.initialized[index] != 1u) {
     error = "SCC mixer system must be initialized before it can be restarted";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   if (state.restart_counts[index] == std::numeric_limits<std::uint64_t>::max()) {
     error = "SCC mixer restart counter cannot be advanced";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   if (!raw_components_are_finite(data, wavefunction, index)) {
     error = "SCC mixer restart wavefunction contains NaN or infinity";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
 
   const std::size_t dimension = system_dimension(data, index);
@@ -1197,114 +1062,108 @@ generativeqc_xtb_status_t restart_scc_mixer_system_cpu(const SccMixerPlan& plan,
   state.residual_maximum[index] = 0.0;
   state.iterations[index] = 0u;
   ++state.restart_counts[index];
-  state.system_statuses[index] = GENERATIVEQC_XTB_STATUS_SUCCESS;
+  state.system_statuses[index] = state.status_encoding.success;
   state.converged[index] = 0u;
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t mix_scc_broyden_system_cpu(const SccMixerPlan& plan, std::int64_t system,
-                                            const SccMixerVectorView& wavefunction,
-                                            const SccMixerState& state,
-                                            const SccMixerWorkspace& workspace,
-                                            std::string& error) {
-  generativeqc_xtb_status_t status = validate_call(plan, wavefunction, state, &workspace, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult mix_broyden_system(const BroydenPlan& plan, std::int64_t system,
+                                 const BroydenVectorView& wavefunction, const BroydenState& state,
+                                 const BroydenWorkspace& workspace, std::string& error) {
+  BroydenResult status = validate_call(plan, wavefunction, state, &workspace, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   if (system < 0 || system >= data.batch_size) {
     error = "SCC mixer worker requires a valid system index";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::size_t index = system_index(system);
   if (state.initialized[index] != 1u) {
     error = "SCC mixer worker requires initialized per-system state";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   return mix_system_unchecked(data, index, wavefunction, state, workspace, error);
 }
 
-generativeqc_xtb_status_t mix_scc_broyden_batch_cpu(const SccMixerPlan& plan,
-                                           const SccMixerVectorView& wavefunction,
-                                           const SccMixerState& state,
-                                           const SccMixerWorkspace& workspace, std::string& error) {
-  generativeqc_xtb_status_t status = validate_call(plan, wavefunction, state, &workspace, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult mix_broyden_batch(const BroydenPlan& plan, const BroydenVectorView& wavefunction,
+                                const BroydenState& state, const BroydenWorkspace& workspace,
+                                std::string& error) {
+  BroydenResult status = validate_call(plan, wavefunction, state, &workspace, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   const std::size_t batch = static_cast<std::size_t>(data.batch_size);
   for (std::size_t system = 0u; system < batch; ++system) {
     if (state.initialized[system] != 1u) {
       error = "SCC mixer batch requires every system state to be initialized";
-      return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+      return BroydenResult::invalid_argument;
     }
   }
 
-  generativeqc_xtb_status_t first_failure = GENERATIVEQC_XTB_STATUS_SUCCESS;
+  BroydenResult first_failure = BroydenResult::success;
   std::string first_error;
   for (std::size_t system = 0u; system < batch; ++system) {
     status = mix_system_unchecked(data, system, wavefunction, state, workspace, error);
-    if (status != GENERATIVEQC_XTB_STATUS_SUCCESS && first_failure == GENERATIVEQC_XTB_STATUS_SUCCESS) {
+    if (status != BroydenResult::success && first_failure == BroydenResult::success) {
       first_failure = status;
       first_error = error;
     }
   }
-  if (first_failure != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+  if (first_failure != BroydenResult::success) {
     error = std::move(first_error);
     return first_failure;
   }
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t prepare_scc_mixer_system_transaction_cpu(const SccMixerPlan& plan,
-                                                          std::int64_t system,
-                                                          const SccMixerState& source,
-                                                          const SccMixerState& staged,
-                                                          std::string& error) {
-  generativeqc_xtb_status_t status = validate_transaction(plan, source, staged, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult prepare_broyden_system_transaction(const BroydenPlan& plan, std::int64_t system,
+                                                 const BroydenState& source,
+                                                 const BroydenState& staged, std::string& error) {
+  BroydenResult status = validate_transaction(plan, source, staged, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   if (system < 0 || system >= data.batch_size) {
     error = "SCC mixer transaction requires a valid system index";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::size_t index = system_index(system);
   if (source.initialized[index] != 1u) {
     error = "SCC mixer transaction source system must be initialized";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   copy_mixer_system_state(data, index, source, staged);
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-generativeqc_xtb_status_t commit_scc_mixer_system_transaction_cpu(const SccMixerPlan& plan,
-                                                         std::int64_t system,
-                                                         const SccMixerState& staged,
-                                                         const SccMixerState& destination,
-                                                         std::string& error) {
-  generativeqc_xtb_status_t status = validate_transaction(plan, staged, destination, error);
-  if (status != GENERATIVEQC_XTB_STATUS_SUCCESS) {
+BroydenResult commit_broyden_system_transaction(const BroydenPlan& plan, std::int64_t system,
+                                                const BroydenState& staged,
+                                                const BroydenState& destination,
+                                                std::string& error) {
+  BroydenResult status = validate_transaction(plan, staged, destination, error);
+  if (status != BroydenResult::success) {
     return status;
   }
-  const SccMixerPlanData& data = *plan.identity();
+  const BroydenPlanData& data = *plan.identity();
   if (system < 0 || system >= data.batch_size) {
     error = "SCC mixer transaction requires a valid system index";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   const std::size_t index = system_index(system);
   if (staged.initialized[index] != 1u) {
     error = "SCC mixer transaction staged system must be initialized";
-    return GENERATIVEQC_XTB_STATUS_INVALID_ARGUMENT;
+    return BroydenResult::invalid_argument;
   }
   copy_mixer_system_state(data, index, staged, destination);
   error.clear();
-  return GENERATIVEQC_XTB_STATUS_SUCCESS;
+  return BroydenResult::success;
 }
 
-}  // namespace generativeqc::xtb::detail::common
+}  // namespace generativeqc::solver::cpu

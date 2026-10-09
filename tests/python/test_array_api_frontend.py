@@ -159,7 +159,7 @@ def test_preview_unsupported_conveniences_fail_closed() -> None:
         xp.divide(1, vector)
     with pytest.raises(ValueError, match="dtype conversions"):
         xp.sum(vector, dtype="float32")
-    with pytest.raises(ValueError, match="keepdims=False"):
+    with pytest.raises(ValueError, match="explicit TensorIR index metadata"):
         xp.sum(vector, keepdims=True)
     with pytest.raises(TypeError, match="axis must be"):
         xp.sum(vector, axis=[0])
@@ -167,6 +167,28 @@ def test_preview_unsupported_conveniences_fail_closed() -> None:
         xp.matmul(vector, vector)
     with pytest.raises(TypeError, match="scientific domains"):
         xp.add(1, matrix)
+
+
+def test_mean_scientific_contract_preserves_rational_coefficients() -> None:
+    ao = IndexSpace("ao", "ao", 3)
+    spec = TensorSpec((Index("p", ao),), role="input")
+    program = trace(
+        lambda x: {
+            "mean": xp.mean(x),
+            "square": xp.square(x),
+        },
+        {"x": spec},
+    )
+    x = np.asarray([-3.0, 0.0, 6.0])
+    outputs = execute(program, {"x": x}).outputs
+    np.testing.assert_array_equal(outputs["mean"], np.asarray(1.0))
+    np.testing.assert_array_equal(outputs["square"], x * x)
+
+    value = input_array("x", spec)
+    with pytest.raises(ValueError, match="explicit TensorIR index metadata"):
+        xp.mean(value, keepdims=True)
+    with pytest.raises(TypeError, match="scientifically annotated"):
+        xp.reciprocal(value)
 
 
 def test_scf_density_expression_has_same_tensorir_identity() -> None:
@@ -324,7 +346,8 @@ def test_capability_report_does_not_claim_full_conformance() -> None:
     assert report["array_api_version"] is None
     assert report["array_namespace_protocol"] is False
     assert report["implicit_broadcast"] == "generic-arrays"
-    assert report["dtype_promotion"] is False
+    assert report["dtype_promotion"] == "generic-float32-float64-explicit-cast"
+    assert report["scientific_dtype_promotion"] is False
     assert report["reshape_requires_explicit_indices"] == "scientific-arrays-only"
     assert (
         report["broadcast_requires_explicit_indices_and_axes"]

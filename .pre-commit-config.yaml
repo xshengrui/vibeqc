@@ -1,7 +1,7 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
-# Preserve exact upstream bytes for vendored source trees with provenance manifests.
-exclude: ^(upstream/|src/xtb/native/|cmake/3rdparty/implib/)
+# Preserve exact upstream bytes and SHA-guarded frozen migration oracles.
+exclude: ^(upstream/|src/xtb/native/|cmake/3rdparty/implib/|tests/native/fixtures/johnson_prechange_3b97c234/|tests/native/fixtures/spectral_prechange_5c02b1ba/)
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -37,6 +37,12 @@ repos:
       - id: public-method-manifest
         name: Check generated native method metadata
         entry: python3 tools/generate_method_manifest.py --check
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: native-api-contracts
+        name: Check public native contracts and reference
+        entry: python3 tools/check_native_api_contracts.py
         language: system
         pass_filenames: false
         always_run: true
@@ -97,6 +103,15 @@ repos:
         args: ["--fix"]
         types_or: [python, pyi, jupyter]
         exclude: ^python/generativeqc_compiler/method/_generated_parameters\.py$
+      # This hook discovers all published __all__ modules at runtime, follows
+      # first-party reexports and audits explicitly defined exported class members.
+      # Ruff D100-D107 also checks the discovered public facade modules.
+      # A newly published API is checked without a manual file allowlist.
+      - id: ruff
+        name: Check public Python contracts and Ruff D1xx
+        entry: python tools/check_public_api_docstrings.py --ruff ruff
+        pass_filenames: false
+        always_run: true
       - id: ruff-format
         types_or: [python, pyi, jupyter]
         exclude: ^python/generativeqc_compiler/method/_generated_parameters\.py$

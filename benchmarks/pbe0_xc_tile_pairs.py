@@ -9,6 +9,8 @@ With --point-batch-tiles both arms retain 256-point AO maps/contractions and
 only the candidate batches independent point domains within an explicit cap.
 With --point-specialization both arms use identical tile and batch requests;
 only the PBE point-consumer implementation changes.
+With --compact-xc-batches both arms request the same point batching; only the
+candidate batches mapped contractions. The 12-atom case covers small AO domains.
 """
 
 from __future__ import annotations
@@ -61,6 +63,7 @@ def main() -> None:
     parser.add_argument("--point-batch-tiles", type=int)
     parser.add_argument("--point-batch-bytes", type=int, default=32 * 1024 * 1024)
     parser.add_argument("--point-specialization", action="store_true")
+    parser.add_argument("--compact-xc-batches", action="store_true")
     args = parser.parse_args()
     allocation = os.environ.get("SLURM_JOB_ID") or (
         os.environ.get("INSPIRE_JOB_NAME") if args.point_specialization else None
@@ -80,7 +83,13 @@ def main() -> None:
         )
     if args.point_specialization and args.point_batch_bytes < 0:
         parser.error("point specialization needs a nonnegative batch byte cap")
+    if args.point_specialization and args.compact_xc_batches:
+        parser.error("point specialization and compact XC batching are separate comparisons")
     os.environ["GENERATIVEQC_STATIONARY_BECKE_PRIMITIVE"] = "off"
+    if args.compact_xc_batches and args.point_batch_tiles is None:
+        parser.error(
+            "compact XC batching requires an explicit --point-batch-tiles request"
+        )
     case = scaling_cases()[f"water-{args.atoms}"]
     basis, _ = load_comparison_basis(
         args.basis_file, case, role="orbital", compute_forces=True
@@ -99,14 +108,15 @@ def main() -> None:
     @contextmanager
     def point_batch_selection(arm: str) -> Any:
         """Reapply each arm when moved coordinates rebuild the native owner."""
-        batch_tiles = (
-            args.point_batch_tiles
-            if args.point_specialization or arm == "candidate"
-            else None
-        )
+        batch_tiles = args.point_batch_tiles if (
+            args.point_specialization or args.compact_xc_batches or arm == "candidate"
+        ) else None
         values = {
             "GENERATIVEQC_CUDA_XC_BATCH_TILES": str(batch_tiles or 1),
             "GENERATIVEQC_CUDA_XC_BATCH_BYTES": str(args.point_batch_bytes),
+            "GENERATIVEQC_CUDA_XC_COMPACT_BATCH": (
+                "1" if arm == "candidate" and args.compact_xc_batches else "0"
+            ),
         }
         if args.point_specialization:
             values["GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION"] = (
@@ -147,6 +157,7 @@ def main() -> None:
             else None
         ),
         "force_tile_points": 256,
+        "compact_xc_batch_request": args.compact_xc_batches,
         "density_scope": "separate independently converged publicly frozen warm snapshots",
         "scope": "complete E+F replays; setup/prime excluded and retained; not cold/moved acceleration",
         "point_specialization": args.point_specialization,
@@ -155,9 +166,19 @@ def main() -> None:
             "benchmarks/pbe0_xc_tile_pairs.py": hashlib.sha256(
                 Path(__file__).read_bytes()
             ).hexdigest(),
-            "python/generativeqc/batch.py": hashlib.sha256(
-                (root / "python/generativeqc/batch.py").read_bytes()
-            ).hexdigest(),
+            **{
+                path: hashlib.sha256((root / path).read_bytes()).hexdigest()
+                for path in (
+                    "python/generativeqc/batch.py",
+                    "python/generativeqc_compiler/dft/xc_point_batch_cuda.py",
+                    "python/generativeqc_compiler/dft/xc_tile_batch_cuda.py",
+                    "python/generativeqc_compiler/dft/xc_compiled_resources.py",
+                    "src/dft/cuda_xc.hpp",
+                    "src/dft/cuda_xc.cpp",
+                    "src/dft/cuda_xc_kernels.cuh",
+                    "src/dft/cuda_ks.cpp",
+                )
+            },
         },
         "reference_sha256": hashlib.sha256(args.reference.read_bytes()).hexdigest(),
         "environment": environment_metadata(accelerator=cuda_accelerator_metadata(cp)),
@@ -231,7 +252,7 @@ def main() -> None:
                 max_iterations=100,
             )
             native_build = native_build_metadata(calculator)
-            require_tuned_native_build(native_build)
+            require_tuned_native_build(native_build, allow_portable=args.point_specialization)
             if "native_build" in record:
                 assert native_build == record["native_build"]
             record["native_build"] = native_build

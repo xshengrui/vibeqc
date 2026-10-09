@@ -33,6 +33,7 @@ from generativeqc_compiler.array_api import (
     capabilities as _compiler_capabilities,
 )
 from generativeqc_compiler.array_api import namespace as _namespace
+from generativeqc_compiler.array_api.trace import active_capture as _active_capture
 from generativeqc_compiler.tensor import (
     Index,
     IndexSpace,
@@ -119,46 +120,70 @@ def _eager_operands(*values: object, scalars: bool = False) -> tuple[np.ndarray,
         else _eager_array(value)
         for value in values
     )
-    dtype = next((array.dtype for array in arrays if array is not None), float64)
-    if any(array is not None and array.dtype != dtype for array in arrays):
-        raise ValueError("operand dtypes must agree; implicit promotion is unsupported")
+    dtype = (
+        float64
+        if any(array is not None and array.dtype == float64 for array in arrays)
+        else float32
+        if any(array is not None for array in arrays)
+        else float64
+    )
     return tuple(
-        _eager_scalar(value, dtype, "arithmetic scalar") if array is None else array
+        _eager_scalar(value, dtype, "arithmetic scalar")
+        if array is None
+        else np.asarray(array, dtype=dtype)
         for value, array in zip(values, arrays, strict=True)
     )
 
 
 def add(x1: object, x2: object) -> typing.Any:
+    """Add two arrays elementwise, with eager NumPy or symbolic TensorIR dispatch.
+
+    Host scalar operands must be exact arithmetic values; array dtypes must agree.
+    """
     if _symbolic(x1, x2):
         return _namespace.add(x1, x2)
     return _eager_compute(np.add, *_eager_operands(x1, x2, scalars=True))
 
 
 def subtract(x1: object, x2: object) -> typing.Any:
+    """Subtract the second array from the first elementwise.
+
+    Use symbolic values to build TensorIR; concrete inputs execute on the host.
+    """
     if _symbolic(x1, x2):
         return _namespace.subtract(x1, x2)
     return _eager_compute(np.subtract, *_eager_operands(x1, x2, scalars=True))
 
 
 def multiply(x1: object, x2: object) -> typing.Any:
+    """Multiply two arrays elementwise without implicit dtype promotion."""
     if _symbolic(x1, x2):
         return _namespace.multiply(x1, x2)
     return _eager_compute(np.multiply, *_eager_operands(x1, x2, scalars=True))
 
 
 def divide(x1: object, x2: object) -> typing.Any:
+    """Divide the first array by the second elementwise.
+
+    Non-finite eager results raise ValueError instead of being returned silently.
+    """
     if _symbolic(x1, x2):
         return _namespace.divide(x1, x2)
     return _eager_compute(np.divide, *_eager_operands(x1, x2, scalars=True))
 
 
 def negative(x: object) -> typing.Any:
+    """Negate each element of a host or symbolic array."""
     if isinstance(x, VibeArray):
         return _namespace.negative(x)
     return _eager_compute(np.negative, _eager_array(x))
 
 
 def pow(x: object, exponent: object) -> typing.Any:
+    """Raise an array to an exact scalar exponent.
+
+    Inputs must be strictly positive; unrepresentable exponents are rejected.
+    """
     if isinstance(x, VibeArray):
         return _namespace.pow(x, exponent)
     array = _eager_array(x)
@@ -172,12 +197,14 @@ def pow(x: object, exponent: object) -> typing.Any:
 
 
 def exp(x: object) -> typing.Any:
+    """Apply the exponential function elementwise to host or symbolic input."""
     if isinstance(x, VibeArray):
         return _namespace.exp(x)
     return _eager_compute(np.exp, _eager_array(x))
 
 
 def log(x: object) -> typing.Any:
+    """Take the elementwise natural logarithm of strictly positive values."""
     if isinstance(x, VibeArray):
         return _namespace.log(x)
     array = _eager_array(x)
@@ -187,6 +214,7 @@ def log(x: object) -> typing.Any:
 
 
 def sqrt(x: object) -> typing.Any:
+    """Take the elementwise square root of nonnegative values."""
     if isinstance(x, VibeArray):
         return _namespace.sqrt(x)
     array = _eager_array(x)
@@ -195,12 +223,30 @@ def sqrt(x: object) -> typing.Any:
     return _eager_compute(np.sqrt, array)
 
 
+def square(x: object) -> typing.Any:
+    """Return elementwise squares for an eager or symbolic array."""
+    if isinstance(x, VibeArray):
+        return _namespace.square(x)
+    return _eager_compute(np.square, _eager_array(x))
+
+
+def reciprocal(x: object) -> typing.Any:
+    """Return elementwise reciprocals for an eager or symbolic array."""
+    if isinstance(x, VibeArray):
+        return _namespace.reciprocal(x)
+    return _eager_compute(np.reciprocal, _eager_array(x))
+
+
 def reshape(
     x: object,
     shape: tuple[int, ...],
     *,
     indices: tuple[Index, ...] | None = None,
 ) -> typing.Any:
+    """Reshape an array, preserving its element count.
+
+    Explicit TensorIR indices are only supported for symbolic arrays.
+    """
     if isinstance(x, VibeArray):
         return _namespace.reshape(x, shape, indices=indices)
     if indices is not None:
@@ -216,6 +262,10 @@ def broadcast_to(
     indices: tuple[Index, ...] | None = None,
     axes: tuple[int, ...] | None = None,
 ) -> typing.Any:
+    """Broadcast an array to a requested shape.
+
+    Explicit indices and axes are reserved for symbolic TensorIR values.
+    """
     if isinstance(x, VibeArray):
         return _namespace.broadcast_to(x, shape, indices=indices, axes=axes)
     if indices is not None or axes is not None:
@@ -225,7 +275,76 @@ def broadcast_to(
     return np.broadcast_to(_eager_array(x), _namespace._shape(shape, "broadcast_to"))
 
 
+def broadcast_shapes(*shapes: tuple[int, ...]) -> tuple[int, ...]:
+    """Return the common broadcast shape without creating arrays."""
+    return _namespace.broadcast_shapes(*shapes)
+
+
+def broadcast_arrays(*arrays: object) -> tuple[typing.Any, ...]:
+    """Broadcast eager arrays or generic symbolic arrays to one common shape.
+
+    Preserve each input dtype. Symbolic inputs must all be VibeArray values
+    with generic index spaces; an empty argument list returns an empty tuple.
+    """
+    if not arrays:
+        return ()
+    if any(isinstance(value, VibeArray) for value in arrays):
+        return _namespace.broadcast_arrays(*arrays)
+    values = tuple(_eager_array(value) for value in arrays)
+    return tuple(np.broadcast_arrays(*values))
+
+
+def expand_dims(x: object, axis: int | tuple[int, ...]) -> typing.Any:
+    """Insert singleton dimensions at unique signed axes in eager or generic symbolic arrays."""
+    if isinstance(x, VibeArray):
+        return _namespace.expand_dims(x, axis)
+    array = _eager_array(x)
+    _namespace._expand_shape(array.shape, axis)
+    return np.expand_dims(array, axis)
+
+
+def squeeze(x: object, axis: int | tuple[int, ...]) -> typing.Any:
+    """Remove the specified singleton axes from an eager or generic symbolic array."""
+    if isinstance(x, VibeArray):
+        return _namespace.squeeze(x, axis)
+    array = _eager_array(x)
+    _namespace._squeezed_shape(array.shape, axis)
+    return np.squeeze(array, axis=axis)
+
+
+def moveaxis(
+    x: object, source: int | tuple[int, ...], destination: int | tuple[int, ...]
+) -> typing.Any:
+    """Move selected axes to matching destinations, preserving the order of the others."""
+    if isinstance(x, VibeArray):
+        return _namespace.moveaxis(x, source, destination)
+    array = _eager_array(x)
+    order = _namespace._moveaxis_order(array.ndim, source, destination)
+    return np.transpose(array, order)
+
+
+def flip(x: object, *, axis: int | tuple[int, ...] | None = None) -> typing.Any:
+    """Reverse the selected axes, or all axes when axis is None.
+
+    Symbolic inputs require generic index spaces and at most 65,536 elements
+    along each flipped axis to bound the static gather maps.
+    """
+    if isinstance(x, VibeArray):
+        return _namespace.flip(x, axis=axis)
+    array = _eager_array(x)
+    axes = (
+        tuple(range(array.ndim))
+        if axis is None
+        else _namespace._normalized_axes(axis, array.ndim, "flip")
+    )
+    return np.flip(array, axis=axes)
+
+
 def slice(x: object, ranges: tuple[tuple[int, int], ...]) -> typing.Any:
+    """Select a half-open (start, stop) range along every input axis.
+
+    Ranges must lie inside the input shape; slicing never changes the axis rank.
+    """
     if isinstance(x, VibeArray):
         return _namespace.slice(x, ranges)
     array = _eager_array(x)
@@ -247,6 +366,7 @@ def slice(x: object, ranges: tuple[tuple[int, int], ...]) -> typing.Any:
 
 
 def take(x: object, indices: tuple[int, ...], *, axis: int) -> typing.Any:
+    """Gather a static tuple of in-range positions along the selected axis."""
     if isinstance(x, VibeArray):
         return _namespace.take(x, indices, axis=axis)
     array = _eager_array(x)
@@ -267,38 +387,55 @@ def sum(
     dtype: object = None,
     keepdims: bool = False,
 ) -> typing.Any:
+    """Reduce over selected axes without retaining reduced dimensions.
+
+    Dtype conversion and keepdims=True are not supported in this preview.
+    """
     if isinstance(x, VibeArray):
         return _namespace.sum(x, axis=axis, dtype=dtype, keepdims=keepdims)
     array = _eager_array(x)
     if dtype is not None:
         raise ValueError("frontend sum does not insert dtype conversions")
-    if type(keepdims) is not bool or keepdims:
-        raise ValueError("frontend sum currently requires keepdims=False")
-    if axis is None:
-        axes = tuple(range(array.ndim))
-    elif type(axis) is int:
-        axes = (_namespace._axis(axis, array.ndim, "sum"),)
-    elif isinstance(axis, tuple):
-        axes = tuple(_namespace._axis(item, array.ndim, "sum") for item in axis)
-    else:
-        raise TypeError("axis must be an int, tuple of ints, or None")
-    return _eager_compute(np.sum, array, axis=tuple(sorted(axes)))
+    if type(keepdims) is not bool:
+        raise TypeError("keepdims must be a bool")
+    axes = _namespace._reduction_axes(axis, array.ndim, "sum")
+    return _eager_compute(np.sum, array, axis=axes, keepdims=keepdims)
+
+
+def mean(
+    x: object,
+    *,
+    axis: int | tuple[int, ...] | None = None,
+    keepdims: bool = False,
+) -> typing.Any:
+    """Average selected axes, optionally retaining singleton reduced dimensions.
+
+    Support eager and symbolic arrays; reject reductions over zero elements.
+    """
+    if isinstance(x, VibeArray):
+        return _namespace.mean(x, axis=axis, keepdims=keepdims)
+    array = _eager_array(x)
+    if type(keepdims) is not bool:
+        raise TypeError("keepdims must be a bool")
+    axes = _namespace._reduction_axes(axis, array.ndim, "mean")
+    count = 1
+    for position in axes:
+        count *= array.shape[position]
+    if count == 0:
+        raise ValueError("mean of an empty reduction is unsupported")
+    return _eager_compute(np.mean, array, axis=axes, keepdims=keepdims)
 
 
 def permute_dims(x: object, axes: tuple[int, ...]) -> typing.Any:
+    """Reorder the axes of a host or symbolic array."""
     if isinstance(x, VibeArray):
         return _namespace.permute_dims(x, axes)
     array = _eager_array(x)
-    if (
-        not isinstance(axes, tuple)
-        or any(type(axis) is not int for axis in axes)
-        or sorted(axes) != list(range(array.ndim))
-    ):
-        raise ValueError("permutation requires each nonnegative axis exactly once")
-    return np.transpose(array, axes)
+    return np.transpose(array, _namespace._permutation(axes, array.ndim))
 
 
 def matrix_transpose(x: object) -> typing.Any:
+    """Swap the last two axes of a host or symbolic matrix-like array."""
     if isinstance(x, VibeArray):
         return _namespace.matrix_transpose(x)
     array = _eager_array(x)
@@ -310,6 +447,7 @@ def matrix_transpose(x: object) -> typing.Any:
 
 
 def matmul(x1: object, x2: object) -> typing.Any:
+    """Multiply matrices using the preview's eager or symbolic dispatch."""
     if _symbolic(x1, x2):
         return _namespace.matmul(x1, x2)
     return _eager_compute(np.matmul, *_eager_operands(x1, x2))
@@ -320,6 +458,10 @@ def einsum(
     *operands: object,
     coefficient: ExactScalar = 1,
 ) -> typing.Any:
+    """Evaluate an Einstein-summation expression with an exact coefficient.
+
+    Concrete operands follow the NumPy eager reference implementation.
+    """
     if _symbolic(*operands):
         return _namespace.einsum(equation, *operands, coefficient=coefficient)
     arrays = _eager_operands(*operands)
@@ -350,6 +492,87 @@ def _dtype_name(dtype: object) -> str:
     if name not in ("float32", "float64"):
         raise TypeError("experimental Array API currently supports float32/float64")
     return name
+
+
+def _dtype_of(value: object) -> np.dtype:
+    """Read an admitted real dtype without converting external array objects."""
+    if isinstance(value, VibeArray):
+        return np.dtype(_dtype_name(value.dtype))
+    if isinstance(value, np.ndarray):
+        _check_host_values(value)
+        return np.dtype(_dtype_name(value.dtype))
+    _check_host_values(value)
+    return np.dtype(_dtype_name(value))
+
+
+def astype(
+    x: object,
+    dtype: object,
+    /,
+    *,
+    copy: bool = True,
+    device: object = None,
+) -> typing.Any:
+    """Explicit float32/float64 conversion with no implicit device transfer."""
+    if type(copy) is not bool:
+        raise TypeError("astype copy must be a bool")
+    if device is not None:
+        raise ValueError("astype currently supports device=None only")
+    target = _dtype_name(dtype)
+    if isinstance(x, VibeArray):
+        return _namespace.astype(x, target, copy=copy)
+    array = _eager_array(x)
+    if not copy and array.dtype.name == target:
+        return array
+    return _eager_compute(np.array, array, dtype=np.dtype(target), copy=True)
+
+
+def can_cast(from_: object, to: object, /) -> bool:
+    """Check safe promotion within the admitted real floating-point dtype lattice."""
+    source, target = _dtype_of(from_), _dtype_of(to)
+    return source == target or (source == float32 and target == float64)
+
+
+def finfo(type: object, /) -> np.finfo:
+    """Describe IEEE machine limits for the admitted real floating-point dtypes."""
+    return np.finfo(_dtype_of(type))
+
+
+def isdtype(dtype: object, kind: object) -> bool:
+    """Inspect admitted dtypes using the standard dtype category vocabulary."""
+    source = _dtype_of(dtype)
+    categories = {
+        "bool",
+        "signed integer",
+        "unsigned integer",
+        "integral",
+        "real floating",
+        "complex floating",
+        "numeric",
+    }
+
+    def matches(value: object) -> bool:
+        if isinstance(value, str):
+            if value not in categories:
+                raise ValueError(f"unsupported dtype kind {value!r}")
+            return value in ("real floating", "numeric")
+        return source == _dtype_of(value)
+
+    if isinstance(kind, tuple):
+        return any(matches(item) for item in kind)
+    return matches(kind)
+
+
+def result_type(*arrays_and_dtypes: object) -> np.dtype:
+    """Infer the float32/float64 common dtype, treating Python scalars as weak."""
+    dtypes: list[np.dtype] = []
+    for value in arrays_and_dtypes:
+        if type(value) in (int, float):
+            continue
+        dtypes.append(_dtype_of(value))
+    if not dtypes:
+        raise TypeError("result_type requires at least one array or dtype")
+    return float64 if float64 in dtypes else float32
 
 
 def asarray(
@@ -388,6 +611,82 @@ def asarray(
     return array
 
 
+def _creation_dtype(dtype: object) -> str:
+    return "float64" if dtype is None else _dtype_name(dtype)
+
+
+def _creation_device(device: object) -> None:
+    if device is not None:
+        raise ValueError(
+            "experimental creation only admits device=None (CPU reference); "
+            "device selection requires a qualified backend"
+        )
+
+
+def full(
+    shape: int | tuple[int, ...],
+    fill_value: object,
+    *,
+    dtype: object = None,
+    device: object = None,
+) -> typing.Any:
+    """Create a finite uniform array, or capture an exact TensorIR constant."""
+    _creation_device(device)
+    target = _namespace._creation_shape(shape)
+    name = _creation_dtype(dtype)
+    if dtype is None and type(fill_value) in (bool, int):
+        raise TypeError(
+            "full with integer/bool fill_value requires an integer/bool dtype "
+            "not supported by this preview; specify a floating dtype explicitly"
+        )
+    factor = _namespace._generic_scalar(fill_value, "full fill value")
+    if _active_capture():
+        return _namespace.full(target, factor, dtype=name)
+    return _eager_compute(np.full, target, float(factor), dtype=np.dtype(name))
+
+
+def zeros(
+    shape: int | tuple[int, ...], *, dtype: object = None, device: object = None
+) -> typing.Any:
+    """Create floating zeros on the CPU reference path or capture a symbolic constant."""
+    return full(shape, 0, dtype=_creation_dtype(dtype), device=device)
+
+
+def ones(
+    shape: int | tuple[int, ...], *, dtype: object = None, device: object = None
+) -> typing.Any:
+    """Create floating ones on the CPU reference path or capture a symbolic constant."""
+    return full(shape, 1, dtype=_creation_dtype(dtype), device=device)
+
+
+def full_like(
+    x: object,
+    fill_value: object,
+    *,
+    dtype: object = None,
+    device: object = None,
+) -> typing.Any:
+    """Create a uniform generic array inheriting the input's shape/dtype."""
+    _creation_device(device)
+    factor = _namespace._generic_scalar(fill_value, "full_like fill value")
+    if isinstance(x, VibeArray):
+        name = x.dtype if dtype is None else _dtype_name(dtype)
+        return _namespace.full_like(x, factor, dtype=name)
+    array = _eager_array(x)
+    name = array.dtype.name if dtype is None else _dtype_name(dtype)
+    return _eager_compute(np.full_like, array, float(factor), dtype=np.dtype(name))
+
+
+def zeros_like(x: object, *, dtype: object = None, device: object = None) -> typing.Any:
+    """Create floating zeros with the input shape and dtype unless dtype is specified."""
+    return full_like(x, 0, dtype=dtype, device=device)
+
+
+def ones_like(x: object, *, dtype: object = None, device: object = None) -> typing.Any:
+    """Create floating ones with the input shape and dtype unless dtype is specified."""
+    return full_like(x, 1, dtype=dtype, device=device)
+
+
 def _generic_spec(array: np.ndarray, *, differentiable: bool) -> TensorSpec:
     return TensorSpec(
         _namespace._generic_indices(tuple(int(extent) for extent in array.shape)),
@@ -412,6 +711,7 @@ class CompiledFunction:
         backend: str,
         differentiable: tuple[str, ...],
     ) -> None:
+        """Bind a callable and validate its reference backend and differentiable inputs."""
         if not callable(function):
             raise TypeError("compile requires a callable")
         if backend != "reference":
@@ -487,6 +787,7 @@ class CompiledFunction:
         return program
 
     def __call__(self, *args: object, **kwargs: object) -> typing.Any:
+        """Execute the shape/dtype-specialized TensorIR reference program."""
         program, feeds = self._prepare(*args, **kwargs)
         execution = _execute(program, feeds)
         if tuple(program.outputs) == ("output",):
@@ -532,7 +833,17 @@ def capabilities() -> dict[str, object]:
     """Return the detached capability contract for this public preview."""
     report = _compiler_capabilities()
     functions = set(typing.cast("tuple[str, ...]", report["functions"]))
-    functions.update({"asarray", "compile", "matrix_transpose"})
+    functions.update(
+        {
+            "asarray",
+            "compile",
+            "matrix_transpose",
+            "can_cast",
+            "finfo",
+            "isdtype",
+            "result_type",
+        }
+    )
     report.update(
         {
             "public_api_version": API_VERSION,
@@ -570,29 +881,49 @@ __all__ = [
     "VibeArray",
     "add",
     "asarray",
+    "astype",
+    "broadcast_arrays",
+    "broadcast_shapes",
     "broadcast_to",
+    "can_cast",
     "capabilities",
     "compile",
     "divide",
     "dlpack_device",
     "einsum",
     "exp",
+    "expand_dims",
+    "finfo",
+    "flip",
     "float32",
     "float64",
+    "full",
+    "full_like",
     "import_dlpack",
     "input_array",
+    "isdtype",
     "log",
     "matmul",
     "matrix_transpose",
+    "mean",
+    "moveaxis",
     "multiply",
     "negative",
+    "ones",
+    "ones_like",
     "permute_dims",
     "pow",
+    "reciprocal",
     "reshape",
+    "result_type",
     "slice",
     "sqrt",
+    "square",
+    "squeeze",
     "subtract",
     "sum",
     "take",
     "trace",
+    "zeros",
+    "zeros_like",
 ]

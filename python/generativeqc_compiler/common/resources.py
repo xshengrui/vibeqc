@@ -62,6 +62,7 @@ class ResourceBudget:
     schema_version: int = 1
 
     def __post_init__(self) -> None:
+        """Validate byte limits, reserve/headroom controls, and unique per-device budgets."""
         if type(self.schema_version) is not int or self.schema_version != 1:
             raise ValueError("unsupported resource budget schema")
         for name in ("host_bytes", "device_bytes", "pinned_host_bytes"):
@@ -88,11 +89,11 @@ class ResourceBudget:
         """Effective caps; reserve uses exact integer arithmetic for large sizes."""
         numerator, denominator = float(self.headroom_fraction).as_integer_ratio()
 
-        def remaining(value: typing.Any, reserve: typing.Any = 0) -> typing.Any:
+        def remaining(value: int, reserve: int = 0) -> int:
             headroom = (value * numerator + denominator - 1) // denominator
             return max(0, value - headroom - reserve)
 
-        limits = {}
+        limits: dict[str, int] = {}
         for name, value, reserve in (
             ("host", self.host_bytes, self.host_reserve_bytes),
             ("device", self.device_bytes, self.device_reserve_bytes),
@@ -104,6 +105,7 @@ class ResourceBudget:
         return limits
 
     def to_dict(self) -> typing.Any:
+        """Serialize all resource-budget fields to a dictionary."""
         return asdict(self)
 
 
@@ -128,6 +130,7 @@ class ResourceIdentity:
     schema_version: int = 1
 
     def __post_init__(self) -> None:
+        """Validate scientific identifiers and canonicalize topology and observables."""
         if type(self.schema_version) is not int or self.schema_version != 1:
             raise ValueError("unsupported resource identity schema")
         for name in ("method", "provider", "backend", "precision", "schedule"):
@@ -142,12 +145,16 @@ class ResourceIdentity:
             self, "topology", json.dumps(topology, sort_keys=True, allow_nan=False)
         )
         observables = tuple(sorted(set(self.observables)))
-        if not observables or any(not isinstance(x, str) or not x for x in observables):
+        if not observables or any(
+            not isinstance(x, str) or not x
+            for x in typing.cast("tuple[object, ...]", observables)
+        ):
             raise ValueError("resource identity requires requested observables")
         object.__setattr__(self, "observables", observables)
 
     @property
     def identity(self) -> typing.Any:
+        """Return the canonical hash of the scientific resource identity fields."""
         return canonical_hash(asdict(self))
 
 
@@ -175,6 +182,7 @@ class ResourceEstimate:
     accounting: str = "capacity_bound"
 
     def __post_init__(self) -> None:
+        """Validate allocation ownership, size, lifetime, memory space, and accounting."""
         if not isinstance(self.name, str) or not self.name:
             raise ValueError("resource allocation needs an owner name")
         checked_bytes(self.bytes)
@@ -209,6 +217,7 @@ class ResourceCandidate:
     decisions: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
+        """Freeze a supported memory-mode candidate with unique allocation owners."""
         if not self.name or self.mode not in (
             "resident",
             "streamed",
@@ -239,6 +248,7 @@ class ResourceRequest:
     infeasible_reason: str | None = None
 
     def __post_init__(self) -> None:
+        """Sort unique provider candidates and validate unsupported/infeasible status."""
         if not self.name or not isinstance(self.identity, ResourceIdentity):
             raise ValueError("request requires an owner and scientific identity")
         candidates = tuple(
@@ -293,6 +303,7 @@ class ResourcePlan:
     schema_version: int = field(default=1, init=False)
 
     def __post_init__(self) -> None:
+        """Validate provider selections and require feasible plans to fit the budget."""
         if not isinstance(self.budget, ResourceBudget):
             raise TypeError("plan requires a ResourceBudget")
         object.__setattr__(self, "requests", tuple(self.requests))
@@ -337,6 +348,7 @@ class ResourcePlan:
 
     @property
     def estimates(self) -> typing.Any:
+        """Return allocation estimates belonging to the selected provider candidates."""
         selected = dict(self.selections)
         return tuple(
             e
@@ -348,13 +360,16 @@ class ResourcePlan:
 
     @property
     def peak_bytes(self) -> typing.Any:
+        """Return peak allocation bytes by memory space, accounting for lifetimes."""
         return _account(self.estimates)[0]
 
     @property
     def resident_bytes(self) -> typing.Any:
+        """Return peak resident allocation bytes by memory space."""
         return _account(self.estimates, resident=True)[0]
 
     def require_feasible(self) -> typing.Any:
+        """Return this plan or raise for unsupported providers or insufficient memory."""
         if self.status == "unsupported":
             raise NotImplementedError(self.diagnostic or self.status)
         if self.status != "feasible":
@@ -362,6 +377,7 @@ class ResourcePlan:
         return self
 
     def to_dict(self) -> typing.Any:
+        """Serialize the plan with memory peaks, peak phases, limits, and identity."""
         payload = asdict(self)
         payload.update(
             peak_bytes=self.peak_bytes,
@@ -374,6 +390,7 @@ class ResourcePlan:
 
     @property
     def identity(self) -> typing.Any:
+        """Return the canonical identity from the complete resource-plan payload."""
         return self.to_dict()["identity"]
 
     @classmethod
@@ -392,22 +409,27 @@ class ResourcePlan:
         for row in record["requests"]:
             candidates = tuple(
                 ResourceCandidate(
-                    **{
-                        **candidate,
-                        "estimates": tuple(
-                            ResourceEstimate(**e) for e in candidate["estimates"]
-                        ),
-                    }
+                    name=candidate["name"],
+                    mode=candidate["mode"],
+                    estimates=tuple(
+                        ResourceEstimate(**estimate)
+                        for estimate in candidate["estimates"]
+                    ),
+                    relative_cost=candidate["relative_cost"],
+                    decisions=tuple(
+                        tuple(decision) for decision in candidate["decisions"]
+                    ),
                 )
                 for candidate in row["candidates"]
             )
             requests.append(
                 ResourceRequest(
-                    **{
-                        **row,
-                        "identity": ResourceIdentity(**row["identity"]),
-                        "candidates": candidates,
-                    }
+                    name=row["name"],
+                    identity=ResourceIdentity(**row["identity"]),
+                    candidates=candidates,
+                    scope_exclusions=tuple(row["scope_exclusions"]),
+                    unsupported_reason=row["unsupported_reason"],
+                    infeasible_reason=row["infeasible_reason"],
                 )
             )
         plan = cls(
@@ -485,6 +507,8 @@ def plan_resources(
             feasible.append((key, selections))
     if feasible:
         return ResourcePlan(budget, requests, min(feasible)[1], "feasible")
+    if closest is None:
+        raise RuntimeError("resource planner found no candidate combination")
     _, selections, peaks, estimates = closest
     failures = {
         space: {
@@ -566,6 +590,7 @@ class ResourceAllocationError(MemoryError):
     """
 
     def __init__(self, space: typing.Any, message: typing.Any) -> None:
+        """Validate and retain the failed memory space alongside its error message."""
         if space not in ("host", "pageable", "pinned", "device"):
             ResourceEstimate("failed allocation", 0, space, 0, 0)
         self.space = space
@@ -590,6 +615,7 @@ class ResourceSession:
     """
 
     def __init__(self, plan: typing.Any, factories: typing.Any) -> None:
+        """Bind a feasible plan to matching factories with uniform provider lifetimes."""
         self.plan = plan.require_feasible()
         self.factories = dict(factories)
         if set(self.factories) != {r.name for r in plan.requests}:
@@ -652,8 +678,10 @@ class ResourceSession:
         while needed:
             attempted.add(self.plan.selections)
             created = {}
+            failed_owner = needed[0]
             try:
                 for name in needed:
+                    failed_owner = name
                     owner = self.factories[name](self.plan)
                     if not callable(getattr(owner, "close", None)):
                         raise TypeError(
@@ -676,7 +704,7 @@ class ResourceSession:
                 self.fallbacks.append(
                     {
                         "phase": phase,
-                        "failed_owner": name,
+                        "failed_owner": failed_owner,
                         "space": error.space,
                         "reason": str(error),
                         "from_plan": self.plan.identity,
@@ -710,11 +738,13 @@ class ResourceSession:
         self._release(self._live)
 
     def __enter__(self) -> typing.Any:
+        """Require an open resource session and return it for context-managed use."""
         if self._closed:
             raise RuntimeError("resource session is closed")
         return self
 
     def __exit__(self, *unused: object) -> None:
+        """Close the resource session when leaving the context."""
         self.close()
 
 

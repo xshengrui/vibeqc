@@ -27,6 +27,7 @@ endfunction()
 function(generativeqc_add_runtime_sources target)
   target_sources(${target} PRIVATE
     src/runtime/context.cpp
+    src/runtime/ragged_topology.cpp
     src/runtime/cuda_provider.cpp
     src/tensor/cpu_linalg.cpp
     src/tensor/cpu/lp64_provider.cpp)
@@ -153,6 +154,8 @@ function(generativeqc_add_integrals_scf_sources target)
     src/scf/solver/mean_field_driver.cpp
     src/scf/solver/eigen_frame.cpp
     src/scf/solver/cpu_target_eigen.cpp
+    src/solver/cpu/johnson_broyden.cpp
+    src/solver/cpu/prepared_spectral.cpp
     src/scf/solver/final_state.cpp
     src/scf/solver/warm_subspace.cpp
     src/scf/gradient/hf_gradient.cpp
@@ -241,6 +244,7 @@ function(generativeqc_add_integrals_scf_sources target)
       src/scf/cuda/queue_plan.cpp
       src/scf/cuda/queue_profile.cpp
       src/scf/cuda/eigensolver.cpp
+      src/solver/cuda/generalized_eigen.cpp
       src/solver/cuda/symmetric_eigen_provider.cpp
       src/solver/cuda/symmetric_eigen_handles.cpp
       src/solver/cuda/symmetric_eigen_workspace.cpp

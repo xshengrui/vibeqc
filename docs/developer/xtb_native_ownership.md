@@ -51,6 +51,18 @@ all real geometry-dependent values on CUDA, refactor its overlap and commit
 epoch one before SCC and energy/force publication. Fresh SAD initialization,
 transactional failure behavior and the bounded SCC Graph fallback are unchanged.
 
+CUDA host setup and admission use `runtime/ragged_topology.*` for immutable
+atom/shell/AO topology validation and exact borrowed projections. This owner
+checks the fourteen storage ranges, offset/map consistency, optional AO buckets,
+plan identity and ordered element fingerprints without allocating or retaining
+storage. Structural validators never inspect pointed-to values; host inspectors
+require host-readable arrays. Native compatibility adapters preserve the existing
+descriptor types and CUDA kernel interfaces through field-wise views. Explicit
+pair storage keeps its first-endpoint-major order. Spin packing, generation
+validation and physical pair-list cutoffs remain native method contracts.
+The production consumer is CUDA host preparation and admission; the CPU GFN
+execution path does not use this topology owner.
+
 ## Scientific ownership
 
 The compiler emits the following production mathematics. Backend owners retain
@@ -80,12 +92,27 @@ admission remain native runtime responsibilities. Generation needs no installed
 GenerativeQC runtime, GPU, or scientific oracle.
 
 CPU linear-algebra ABI, runtime-provider verification/lifetime and primitive
-bindings live in `tensor/cpu/lp64_provider.*`; GFN retains its method admission,
-generalized transforms and publication. Both GFN and the canonical Gaussian
+bindings live in `tensor/cpu/lp64_provider.*`. The shared
+`solver/cpu/prepared_spectral.*` owner seals ragged spectral dimensions, admits
+borrowed cache/work resources, stages overlap factorization and executes each
+generalized spectrum. GFN's `methods/gfn2_electronic_update.cpp` adapter retains
+electronic admission, spin packing, occupations, densities, thermodynamics and
+publication. Its existing compatibility header also serves CUDA host planning;
+the shared plan initializes no numerical provider. Both GFN and the canonical Gaussian
 CPU path execute `solver/cpu/symmetric_eigen.hpp`, with separate borrowed
 column-major and owned row-major contracts. See
 [CPU linear algebra](cpu_linear_algebra.md) for the exact work-count, fallback,
 thread and status boundaries.
+
+CPU Johnson-Broyden plans, exact storage admission, persistent history and
+per-system transactions live in `solver/cpu/johnson_broyden.*`. The GFN2 adapter
+binds its ordered qsh/dipole/quadrupole fields and maps typed solver outcomes to
+method status records. Caller-owned storage and a sealed plan copy must outlive
+their bindings. Residual diagnostics do not authorize terminal publication:
+GFN2 retains its energy/RMS convergence decision and raw terminal multipoles.
+The generic CPU compiler binding and GFN2 CUDA binding consume the shared
+ordered-history algebra with their existing compact and capacity-strided
+schedules; CUDA admission and execution remain in the native GFN2 adapter.
 
 CUDA symmetric-eigen setup uses the method-neutral
 `solver/cuda/symmetric_eigen_workspace.*` service. GFN2 declares both vector

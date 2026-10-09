@@ -156,6 +156,7 @@ CUDA_MODULES["cuda_df_runtime"] = (
 CUDA_ALLOWED["cuda_df_runtime"] = tuple(
     "scf/cuda/" + stem + "." for stem in CUDA_MODULES["cuda_df_runtime"]
 ) + (
+    "solver/cuda/generalized_eigen.hpp",
     "solver/cuda/symmetric_eigen_provider.hpp",
     "solver/cuda/symmetric_eigen_workspace.hpp",
     "solver/cuda/symmetric_eigen_handles.hpp",
@@ -301,6 +302,7 @@ CUDA_ALLOWED["cuda_direct_provider_host"] = (
     "scf/direct_task_layout.hpp",
     "scf/aot_shell_registry.hpp",
     "scf/cuda/direct_jk_kernels.hpp",
+    "scf/cuda/direct_md_j.hpp",
     "scf/cuda/packed_basis.",
     "scf/cuda/checked_layout.",
     "scf/cuda/metadata_upload.",
@@ -330,6 +332,7 @@ CUDA_ALLOWED["cuda_one_electron_export"] = tuple(
 )
 CUDA_MODULES["cuda_provider_kernel_interfaces"] = (
     "direct_jk_kernels.hpp",
+    "direct_md_j.hpp",
     "one_electron_export_kernels.hpp",
 )
 CUDA_ALLOWED["cuda_provider_kernel_interfaces"] = (
@@ -347,6 +350,7 @@ CUDA_MODULES["cuda_integral_numerics"] = (
     "boys_table",
     "hermite_recurrence",
     "coulomb_auxiliary",
+    "md_hermite_index",
 )
 CUDA_ALLOWED["cuda_integral_numerics"] = tuple(
     "scf/cuda/" + stem + "." for stem in CUDA_MODULES["cuda_integral_numerics"]
@@ -471,6 +475,8 @@ CUDA_MODULES["cuda_direct_consumers"] = (
     "direct_bounded_fallback.cu",
     "direct_angular_force.cu",
     "direct_jk_kernels.cu",
+    "direct_md_j.cu",
+    "direct_md_jk.cu",
     "weighted_eri_kernels.cu",
 )
 CUDA_ALLOWED["cuda_direct_consumers"] = (
