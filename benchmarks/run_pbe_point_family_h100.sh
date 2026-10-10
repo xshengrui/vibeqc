@@ -7,7 +7,7 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 root=/inspire/qb-ilm/project/chemicalreaction/czxs25220150/projects/vibeqc-2072-point-family
 run="$root/runs/$INSPIRE_JOB_NAME"
 venv="$root/venv"
-build="$repo/build/issue-2072-sm90-cuda129"
+build="$repo/build/issue-2072-sm90-cuda129-shell-aot"
 mkdir -p "$run"
 cd "$repo"
 export CUDA_PATH="$root/cuda-12.9"
@@ -36,6 +36,19 @@ if [ "${1:-}" = --probe ]; then
   exit 0
 fi
 
+"$venv/bin/python" - "$repo/python/generativeqc_compiler/integral/production_shell_classes.json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as source:
+    profile = json.load(source)["architectures"]["portable_cuda"]
+if not profile["kernels"]:
+    raise SystemExit(
+        "H100 complete E+F qualification requires a qualified shell force profile; "
+        "portable_cuda currently has no production shell kernels"
+    )
+PY
+
 "$venv/bin/sccache" --version | tee "$run/sccache-version.txt"
 nvcc --version > "$run/nvcc-version.txt"
 sha256sum "$CUDA_PATH/bin/nvcc" > "$run/nvcc.sha256"
@@ -56,7 +69,7 @@ cmake -S "$repo" -B "$build" -G Ninja \
   -DGENERATIVEQC_ENABLE_CUDA=ON \
   -DGENERATIVEQC_CUDA_COMPILE_ARCHITECTURES=90-real \
   -DGENERATIVEQC_AOT_PROFILE=portable \
-  -DGENERATIVEQC_ENABLE_AOT_SHELLS=OFF \
+  -DGENERATIVEQC_ENABLE_AOT_SHELLS=ON \
   -DGENERATIVEQC_STATIONARY_AOT_PROFILES=pbe0_rks \
   -DGENERATIVEQC_AOT_UNIT_MODE=stable-shards \
   -DGENERATIVEQC_CUDA_FAST_COMPILE=OFF \
@@ -69,9 +82,15 @@ cmake -S "$repo" -B "$build" -G Ninja \
     tail -n 100 "$run/configure.log"; exit 1;
   }
 cmake --build "$build" --parallel 8 --target generativeqc generativeqc_dft_cuda_tests \
+  generativeqc_stationary_pbe0_rks_manifest \
+  generativeqc_stationary_pbe0_rks_spd_manifest \
   > "$run/build.log" 2>&1 || { tail -n 100 "$run/build.log"; exit 1; }
 grep -m 3 sccache "$build/build.ninja" > "$run/launcher-check.txt"
-sha256sum "$build/libgenerativeqc.so" > "$run/library.sha256"
+sha256sum "$build/libgenerativeqc.so" \
+  "$build/generativeqc_stationary_pbe0_rks.json" \
+  "$build/libgenerativeqc_stationary_pbe0_rks.so" \
+  "$build/generativeqc_stationary_pbe0_rks_spd.json" \
+  "$build/libgenerativeqc_stationary_pbe0_rks_spd.so" > "$run/artifacts.sha256"
 
 for mode in 0 1; do
   export GENERATIVEQC_CUDA_XC_PBE_POINT_SPECIALIZATION="$mode"
@@ -95,12 +114,27 @@ for atoms in 48 96; do
     --output "$run/feasibility-$atoms.json" > "$run/feasibility-$atoms.log" 2>&1
 done
 
-"$venv/bin/python" -m benchmarks.pbe0_xc_tile_pairs \
-  --atoms 48 \
-  --basis-file benchmarks/results/pbe0-def2-svp-20261003/def2-svp-ho.json \
-  --reference "$run/reference-48.json" \
-  --point-specialization --repeats 5 \
-  --output "$run/pairs-48.json" > "$run/pairs-48.log" 2>&1
+for atoms in 48 96; do
+  "$venv/bin/python" -m benchmarks.pbe0_xc_tile_pairs \
+    --atoms "$atoms" \
+    --basis-file benchmarks/results/pbe0-def2-svp-20261003/def2-svp-ho.json \
+    --reference "$run/reference-$atoms.json" \
+    --point-specialization --repeats 5 \
+    --output "$run/pairs-$atoms.json" > "$run/pairs-$atoms.log" 2>&1
 
-"$venv/bin/python" -c 'import json,sys; from tools.generativeqc_validation.pbe0_xc_tiles import verify_point_family_pairs; from pathlib import Path; run=Path(sys.argv[1]); verify_point_family_pairs(json.loads((run/"pairs-48.json").read_text()), json.loads((run/"reference-48.json").read_text())); print("fixed-work PBE0 point-family pairs: PASS")' "$run" \
-  > "$run/audit.log" 2>&1
+  "$venv/bin/python" - "$run" "$atoms" > "$run/audit-$atoms.log" 2>&1 <<'PY'
+import json
+import sys
+from pathlib import Path
+
+from tools.generativeqc_validation.pbe0_xc_tiles import verify_point_family_pairs
+
+run = Path(sys.argv[1])
+atoms = int(sys.argv[2])
+verify_point_family_pairs(
+    json.loads((run / f"pairs-{atoms}.json").read_text()),
+    json.loads((run / f"reference-{atoms}.json").read_text()),
+)
+print(f"{atoms}-atom fixed-work PBE0 point-family pairs: PASS")
+PY
+done

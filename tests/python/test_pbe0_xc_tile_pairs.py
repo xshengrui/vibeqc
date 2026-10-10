@@ -86,7 +86,10 @@ def run_fake_campaign(
             self.compact_policies.append(
                 os.environ["GENERATIVEQC_CUDA_XC_COMPACT_BATCH"]
             )
-            forces, _ = self._public_dft_cuda_force()
+            failed_force = (
+                mutation == "force-status" and self.tile == 256 and len(self.calls) == 1
+            )
+            forces, _ = (None, None) if failed_force else self._public_dft_cuda_force()
             candidate = (
                 self.tile == 512
                 or self.point_specialization == "1"
@@ -101,7 +104,10 @@ def run_fake_campaign(
             item = SimpleNamespace(
                 energy=-1.0,
                 forces=forces,
-                status=0,
+                status=3 if failed_force else 0,
+                status_message="prepared derivative source unavailable"
+                if failed_force
+                else "",
                 converged=True,
                 iterations=iterations,
                 fock_builds=iterations,
@@ -309,6 +315,16 @@ def test_invalid_controls_work_and_vectors_fail_closed(
     """A faster-looking invalid replay cannot become accepted timing evidence."""
     with pytest.raises(AssertionError):
         run_fake_campaign(monkeypatch, tmp_path, mutation)
+
+
+def test_failed_force_reports_public_status(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    with pytest.raises(
+        RuntimeError,
+        match="baseline E\\+F failed: status=3, message=prepared derivative source unavailable",
+    ):
+        run_fake_campaign(monkeypatch, tmp_path, "force-status")
 
 
 def test_retained_publication_and_complete_pairs() -> None:

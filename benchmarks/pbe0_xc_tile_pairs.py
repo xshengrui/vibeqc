@@ -84,7 +84,9 @@ def main() -> None:
     if args.point_specialization and args.point_batch_bytes < 0:
         parser.error("point specialization needs a nonnegative batch byte cap")
     if args.point_specialization and args.compact_xc_batches:
-        parser.error("point specialization and compact XC batching are separate comparisons")
+        parser.error(
+            "point specialization and compact XC batching are separate comparisons"
+        )
     os.environ["GENERATIVEQC_STATIONARY_BECKE_PRIMITIVE"] = "off"
     if args.compact_xc_batches and args.point_batch_tiles is None:
         parser.error(
@@ -108,9 +110,15 @@ def main() -> None:
     @contextmanager
     def point_batch_selection(arm: str) -> Any:
         """Reapply each arm when moved coordinates rebuild the native owner."""
-        batch_tiles = args.point_batch_tiles if (
-            args.point_specialization or args.compact_xc_batches or arm == "candidate"
-        ) else None
+        batch_tiles = (
+            args.point_batch_tiles
+            if (
+                args.point_specialization
+                or args.compact_xc_batches
+                or arm == "candidate"
+            )
+            else None
+        )
         values = {
             "GENERATIVEQC_CUDA_XC_BATCH_TILES": str(batch_tiles or 1),
             "GENERATIVEQC_CUDA_XC_BATCH_BYTES": str(args.point_batch_bytes),
@@ -238,6 +246,14 @@ def main() -> None:
 
         return observed
 
+    def completed_force_work(item: Any, arm: str) -> Any:
+        if item.status != 0 or not item.converged or item.forces is None:
+            raise RuntimeError(
+                f"{arm} E+F failed: status={item.status}, "
+                f"message={item.status_message}, converged={item.converged}"
+            )
+        return force_work[arm]
+
     try:
         for arm, tile in tiles.items():
             calculator = Calculator(
@@ -252,7 +268,9 @@ def main() -> None:
                 max_iterations=100,
             )
             native_build = native_build_metadata(calculator)
-            require_tuned_native_build(native_build, allow_portable=args.point_specialization)
+            require_tuned_native_build(
+                native_build, allow_portable=args.point_specialization
+            )
             if "native_build" in record:
                 assert native_build == record["native_build"]
             record["native_build"] = native_build
@@ -294,7 +312,11 @@ def main() -> None:
                         "geometry": geometry,
                         "seconds": perf_counter() - started,
                         "diagnostics": diagnostics(
-                            item, arm, geometry, force_work[arm], read_ao_work(owner)
+                            item,
+                            arm,
+                            geometry,
+                            completed_force_work(item, arm),
+                            read_ao_work(owner),
                         ),
                     }
                 )
@@ -312,7 +334,11 @@ def main() -> None:
                         "phase": phase,
                         "seconds": perf_counter() - started,
                         "diagnostics": diagnostics(
-                            primed, arm, geometry, force_work[arm], read_ao_work(owner)
+                            primed,
+                            arm,
+                            geometry,
+                            completed_force_work(primed, arm),
+                            read_ao_work(owner),
                         ),
                     }
                 )
@@ -335,7 +361,9 @@ def main() -> None:
                         )
                         .items[0]
                     )
-                results.append((item, force_work[arm], read_ao_work(owners[arm])))
+                results.append(
+                    (item, completed_force_work(item, arm), read_ao_work(owners[arm]))
+                )
                 return {"call_index": len(results) - 1}
 
             inputs_hash = canonical_hash(
