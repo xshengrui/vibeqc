@@ -1225,10 +1225,8 @@ class KsPreparedCalculation final : public PreparedCalculation {
     const auto& one = fock_.one_electron();
     const auto matrix_elements = one.nbf * one.nbf;
     const auto coordinates = 3 * system_.atoms.size();
-    if (spins < 1 || spins > 2 || density.size() != spins || weighted_density.size() != spins ||
-        one.ncoord != coordinates || one.hcore_derivative.size() != coordinates * matrix_elements ||
-        one.overlap_derivative.size() != coordinates * matrix_elements) {
-      detail = "density-fitted stationary D/W or one-electron derivative shape mismatch";
+    if (spins < 1 || spins > 2 || density.size() != spins || weighted_density.size() != spins) {
+      detail = "density-fitted stationary D/W shape mismatch";
       return GENERATIVEQC_STATUS_INVALID_ARGUMENT;
     }
     for (unsigned spin = 0; spin < spins; ++spin)
@@ -1284,6 +1282,13 @@ class KsPreparedCalculation final : public PreparedCalculation {
       // contraction. CUDA only reaches this branch when the optional resident
       // one-electron consumer cannot be admitted; J/K response ownership is
       // unaffected.
+      fock_.ensure_one_electron_derivatives();
+      if (one.ncoord != coordinates ||
+          one.hcore_derivative.size() != coordinates * matrix_elements ||
+          one.overlap_derivative.size() != coordinates * matrix_elements) {
+        detail = "density-fitted stationary one-electron derivative shape mismatch";
+        return GENERATIVEQC_STATUS_INVALID_ARGUMENT;
+      }
       hcore.assign(coordinates, 0.0);
       pulay.assign(coordinates, 0.0);
       for (std::size_t coordinate = 0; coordinate < coordinates; ++coordinate) {
@@ -1395,6 +1400,43 @@ class KsPreparedCalculation final : public PreparedCalculation {
     output = std::move(candidate);
     detail.clear();
     return GENERATIVEQC_STATUS_SUCCESS;
+  }
+
+  /** Reuse the exact retained response providers without claiming a complete
+   * analytic force. The validated single-system snapshot supplies D/W and the
+   * live token proves the SCF Hamiltonian and basis have not changed. */
+  generativeqc_status prepared_integral_gradient(
+      const dft::CudaKsFinalStateToken& expected,
+      const std::vector<scf::reference::Matrix>& density,
+      const std::vector<scf::reference::Matrix>& weighted_density, std::vector<double>& output,
+      std::size_t maximum_bytes, std::array<std::uint64_t, 9>& work, std::string& detail) {
+    output.clear();
+    work = {};
+    if (!system_.ecp_terms.empty() ||
+        std::any_of(system_.atoms.begin(), system_.atoms.end(),
+                    [](const auto& atom) { return atom.ecp_core != 0; }) ||
+        execution_plan_.range_exchange || execution_plan_.nonlocal_correlation ||
+        execution_plan_.d4_correction) {
+      detail = "native stationary integral sources require uncorrected all-electron full-range KS";
+      return GENERATIVEQC_STATUS_NOT_IMPLEMENTED;
+    }
+    dft::CudaKsFinalStateToken current;
+    const auto status = final_state_token(current, detail);
+    if (status != GENERATIVEQC_STATUS_SUCCESS) return status;
+    if (current != expected) {
+      detail = "native stationary integral source token is stale";
+      return GENERATIVEQC_STATUS_INVALID_ARGUMENT;
+    }
+    if (options_.density_fitting_mode != GENERATIVEQC_DENSITY_FITTING_NONE)
+      return density_fitted_integral_gradient(expected, density, weighted_density, output,
+                                              maximum_bytes, work, detail);
+#if GENERATIVEQC_HAS_CUDA
+    if (cuda_)
+      return cuda_integral_gradient(expected, output, maximum_bytes, work, detail, &density,
+                                    &weighted_density);
+#endif
+    detail = "CPU Direct KS stationary integral sources need a retained native derivative owner";
+    return GENERATIVEQC_STATUS_NOT_IMPLEMENTED;
   }
 
   generativeqc_status cuda_full_range_integral_derivatives(
@@ -2454,6 +2496,21 @@ generativeqc_status read_dft_final_state(PreparedCalculation& calculation,
   state = {};
   detail = "prepared calculation is not a KS final-state owner";
   return GENERATIVEQC_STATUS_INVALID_ARGUMENT;
+}
+
+generativeqc_status dft_prepared_integral_gradient_cached(
+    PreparedCalculation& calculation, const dft::CudaKsFinalStateToken& expected,
+    const std::vector<scf::reference::Matrix>& density,
+    const std::vector<scf::reference::Matrix>& weighted_density, std::vector<double>& output,
+    std::size_t maximum_bytes, std::array<std::uint64_t, 9>& work, std::string& detail) {
+  auto* ks = dynamic_cast<KsPreparedCalculation*>(&calculation);
+  if (ks)
+    return ks->prepared_integral_gradient(expected, density, weighted_density, output,
+                                          maximum_bytes, work, detail);
+  output.clear();
+  work = {};
+  detail = "stationary integral sources require a native prepared KS calculation";
+  return GENERATIVEQC_STATUS_NOT_IMPLEMENTED;
 }
 
 generativeqc_status dft_final_state_token(const PreparedBatch& batch, std::size_t index,

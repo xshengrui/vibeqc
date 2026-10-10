@@ -35,6 +35,8 @@ def test_generated_exchange_owner_retains_bounded_force_state() -> None:
         assert token in header
         assert token in source
     assert "launch_bounded_shell_energy_derivative(" in source
+    assert "separate_sources, shared.topology);" in source
+    assert "separate_sources, block_domain, force_topology);" in consumer
     assert "launch_bounded_shell_rsh_derivatives(" in source
     rsh_begin = source.index("cudaError_t execute_generated_rsh_energy_derivatives(")
     rsh_end = source.index("cudaError_t enqueue_generated_coulomb(", rsh_begin)
@@ -397,7 +399,7 @@ def test_canonical_screening_fixture_preserves_default_and_opt_in_coverage() -> 
     source = _source("tests/native/test_cuda_fock_provider.cpp")
 
     def body(name: str) -> str:
-        begin = source.index(f"void {name}() {{")
+        begin = source.index(f"void {name}(")
         return source[begin : source.index("\n}\n", begin)]
 
     screened = body("canonical_screened_values")
@@ -583,7 +585,13 @@ def test_prepared_one_electron_force_borrows_direct_shell_metadata() -> None:
         "exchange && exchange->force_capability && exchange->shared && exchange->force"
         in bridge
     )
-    assert "constexpr unsigned schedule = 1" in bridge
+    assert (
+        'std::getenv("GENERATIVEQC_ONE_ELECTRON_DERIVATIVE_MAPPING") != nullptr && '
+        "cuda_policy::one_electron_derivative_mapping_requested() == 3 ? 3U : 1U"
+        in " ".join(bridge.split())
+    )
+    assert "hcore_schedule, 1.0, output, source->stream" in bridge
+    assert "1, 1.0, output, source->stream" in bridge
     assert (
         "auto* output = generated_owner ? exchange->force : source->derivative"
         in bridge

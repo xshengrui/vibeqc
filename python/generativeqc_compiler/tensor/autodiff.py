@@ -2,8 +2,8 @@
 
 The rules are matrix-free: a VJP propagates one cotangent through one
 primal evaluation and never materializes a Jacobian.  A JVP evaluates one
-tangent direction through the same immutable SSA graph.  The module covers
-every primitive in :data:`generativeqc_compiler.tensor.ir.PRIMITIVES`.
+tangent direction through the same immutable SSA graph. Boolean data and
+comparisons are explicitly non-differentiable.
 
 Slice A deliberately stops at dense general tensors.  Differentiating with
 respect to a packed/symmetric parameter requires the transpose of the
@@ -28,7 +28,7 @@ from types import MappingProxyType
 import numpy as np
 
 from .interpreter import _evaluate, evaluate_nodes
-from .ir import Node, _execution_power_exponent
+from .ir import COMPARISONS, Node, _execution_power_exponent
 from .program import Program
 from .scaled_arithmetic import scaled_bilinear_value
 from .types import checked_size
@@ -181,6 +181,7 @@ def capabilities() -> dict:
         "schema_version": AD_VERSION,
         "rule_version": AD_RULE_VERSION,
         "primitives": sorted(AD_PRIMITIVES),
+        "non_differentiable_primitives": sorted(COMPARISONS),
         "modes": ["jvp", "vjp"],
         "backend": BACKEND,
         "packed_symmetry": False,
@@ -646,6 +647,12 @@ def _vjp_einsum(node: Node, values: typing.Any, bar: typing.Any) -> list[np.ndar
             for contribution in _einsum_vjp_reference(node, values, bar)
         ]
     contributions = []
+    # Only the largest operand's all-ones storage is needed. Every einsum
+    # consumes its shaped prefix synchronously, and a view changes no values.
+    # Keeping a single FP64/declared-dtype buffer avoids N backing allocations
+    # for high-arity contractions with varied operand shapes.
+    max_ones = max((math.prod(item.spec.shape) for item in node.inputs), default=0)
+    ones_storage = np.ones(max_ones, dtype=node.spec.dtype)
     for differentiated, operand_labels in enumerate(labels):
         arguments = [bar, output]
         for operand, (value, label) in enumerate(zip(values, labels)):
@@ -653,7 +660,8 @@ def _vjp_einsum(node: Node, values: typing.Any, bar: typing.Any) -> list[np.ndar
                 arguments.extend((value, list(label)))
         # A ones operand carries the requested output labels.  It contributes
         # no numerical factor but makes summed labels legal einsum outputs.
-        ones = np.ones(node.inputs[differentiated].spec.shape, dtype=node.spec.dtype)
+        shape = node.inputs[differentiated].spec.shape
+        ones = ones_storage[: math.prod(shape)].reshape(shape)
         arguments.extend((ones, list(operand_labels)))
         contributions.append(
             np.einsum(*arguments, list(operand_labels), optimize=False) * coefficient
@@ -925,6 +933,8 @@ def jvp(
     """
     if not isinstance(program, Program):
         raise TypeError("jvp requires a Program")
+    if any(node.spec.dtype == "bool" for node in program.live_nodes):
+        raise ValueError("Boolean TensorIR data and comparisons are non-differentiable")
     checked_size(max_bytes, "autodiff byte budget")
     tangents = _validate_tangents(program, tangents)
     selected = _select_names(program.outputs, outputs, "output")
@@ -961,6 +971,8 @@ def vjp(
     """
     if not isinstance(program, Program):
         raise TypeError("vjp requires a Program")
+    if any(node.spec.dtype == "bool" for node in program.live_nodes):
+        raise ValueError("Boolean TensorIR data and comparisons are non-differentiable")
     checked_size(max_bytes, "autodiff byte budget")
     cotangents = _validate_cotangents(program, cotangents)
     differentiable = {
@@ -1017,6 +1029,8 @@ def dot_test(
     """Check ``<w, Jv> == <J^T w, v>`` on one fixed primal evaluation."""
     if not isinstance(program, Program):
         raise TypeError("dot_test requires a Program")
+    if any(node.spec.dtype == "bool" for node in program.live_nodes):
+        raise ValueError("Boolean TensorIR data and comparisons are non-differentiable")
     if not math.isfinite(rtol) or rtol < 0:
         raise ValueError("rtol must be finite and nonnegative")
     checked_size(max_bytes, "autodiff byte budget")

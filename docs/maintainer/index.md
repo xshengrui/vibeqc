@@ -13,6 +13,7 @@ Keep the distinction clear: the current rules and qualification procedures live 
 validation
 oh_uhf_comparison
 performance_engineering
+gfn2_density_work_diagnostics
 evidence_retention
 resource_planning
 roadmap
@@ -44,6 +45,7 @@ cuda_ownership
 vendor_boundaries
 cpu_autotuning
 source_work_audit
+hot_loop_allocation_disposition
 replay_allocation_receipts
 native_structured_materialization
 residency_receipts

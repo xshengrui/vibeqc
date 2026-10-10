@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections import Counter
 from functools import cache
 from pathlib import Path
 
@@ -25,11 +24,11 @@ from tools.generate_rccsd_native import (
     REPRESENTATIVE,
     _cpu_function,
     _cuda_program,
-    _label_dims,
     _packed_batched_matrix_gemm,
     _packed_matrix_gemm,
     _required_function,
     _size,
+    contraction_query,
     ordered_batch_accumulation,
     with_jacobi_update,
 )
@@ -90,28 +89,6 @@ def auxiliary_accumulation() -> tuple[str, str]:
             )
         ),
     )
-
-
-def contraction_query(program: Program, name: str, *, batch_dim: bool = False) -> str:
-    """Exact scalar summand count; includes output and all reduction labels.
-
-    This is semantic contraction work, not a hardware FLOP or wall-time model.
-    Callers multiply the per-Q value by every actually evaluated auxiliary slice.
-    """
-    terms: Counter[tuple[str, ...]] = Counter()
-    for node in program.live_nodes:
-        if node.op == "einsum":
-            terms[tuple(sorted(_label_dims(node).values()))] += 1
-    lines = [
-        f"inline std::size_t {name}(std::size_t o,std::size_t v{',std::size_t q' if batch_dim else ''}) {{",
-        "  std::size_t total=0;",
-    ]
-    if any("n" in dimensions for dimensions in terms):
-        lines.append("  const auto n=checked_add(o,v);")
-    for dimensions, count in sorted(terms.items()):
-        factors = ",".join((str(count), *dimensions))
-        lines.append(f"  total=checked_add(total,checked_product({{{factors}}}));")
-    return "\n".join([*lines, "  return total;", "}"])
 
 
 def cpu_header() -> str:

@@ -1932,6 +1932,7 @@ ScfResult run_rhf_density_fitting_cuda_impl(const core::System& system,
                                             const std::vector<double>* initial_density,
                                             initial_guess::OverlapOrthogonalizer* overlap_cache) {
   host_trace::Region endpoint_trace("run_rhf_density_fitting_cuda_impl");
+  reject_cuda_df_preliminary_guess(options);
   if (options.hooks || options.strict_initial_density)
     throw std::invalid_argument("SCF proposal callbacks require the CPU reference backend");
 
@@ -1990,6 +1991,15 @@ ScfResult run_rhf_density_fitting_cuda_impl(const core::System& system,
       result.converged = true;
       finalize_density_fitting_rhf(data, orthogonalizer, occupied, density, options, result,
                                    plan.get(), 0, true);
+      return result;
+    }
+    if (!options.density_fitting_host_retry) {
+      if (device_status != GENERATIVEQC_STATUS_SUCCESS || device_records.size() != 1)
+        throw std::runtime_error(detail.empty() ? "CUDA DF preliminary SCF refused" : detail);
+      result.iterations = device_records.front().iterations;
+      result.energy = device_records.front().energy;
+      result.energy_change = device_records.front().energy_change;
+      result.density_rms = device_records.front().density_rms;
       return result;
     }
   }
@@ -2051,6 +2061,7 @@ ScfResult run_uhf_density_fitting_cuda_impl(const core::System& system,
                                             const std::vector<double>* initial_density,
                                             initial_guess::OverlapOrthogonalizer* overlap_cache) {
   host_trace::Region endpoint_trace("run_uhf_density_fitting_cuda_impl");
+  reject_cuda_df_preliminary_guess(options);
   if (options.hooks || options.strict_initial_density)
     throw std::invalid_argument("SCF proposal callbacks require the CPU reference backend");
 
@@ -2185,6 +2196,7 @@ std::vector<RhfBucketItem> run_rhf_density_fitting_cuda_bucket_impl(
     std::vector<std::optional<DensityFittingScfData>>* prepared_cache,
     const std::vector<initial_guess::OverlapOrthogonalizer*>* overlap_caches) {
   host_trace::Region endpoint_trace("run_rhf_density_fitting_cuda_bucket_impl");
+  reject_cuda_df_preliminary_guess(options);
   if (overlap_caches && (overlap_caches->size() != systems.size() ||
                          std::any_of(overlap_caches->begin(), overlap_caches->end(),
                                      [](auto* cache) { return !cache; })))
@@ -2684,6 +2696,7 @@ std::vector<RhfBucketItem> run_uhf_density_fitting_cuda_bucket_impl(
     std::vector<std::optional<DensityFittingScfData>>* prepared_cache,
     const std::vector<initial_guess::OverlapOrthogonalizer*>* overlap_caches) {
   host_trace::Region endpoint_trace("run_uhf_density_fitting_cuda_bucket_impl");
+  reject_cuda_df_preliminary_guess(options);
   if (overlap_caches && (overlap_caches->size() != systems.size() ||
                          std::any_of(overlap_caches->begin(), overlap_caches->end(),
                                      [](auto* cache) { return !cache; })))

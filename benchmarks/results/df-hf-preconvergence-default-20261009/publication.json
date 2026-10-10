@@ -1,0 +1,101 @@
+{
+  "archives": [],
+  "decision": {
+    "reason": "The original numerical evidence and separately labeled qualifying 144/230 cases pass their unchanged gates. Rejected streamed 414 proposals are retained as negative evidence, not admitted qualification or compiler promotion. Complete endpoint timings, work counts and source/binary identities remain separately scoped.",
+    "scope": "numerical",
+    "status": "accepted"
+  },
+  "files": [
+    {
+      "bytes": 3519,
+      "path": "evidence.json.gz",
+      "role": "evidence",
+      "sha256": "cb654c2ab52678cda389e73f14108be36959763a8db33387de1657efa02f9de4"
+    },
+    {
+      "bytes": 1871,
+      "path": "qualification.json",
+      "role": "summary",
+      "sha256": "6df94287d7d1f55d705036d17d227725f0ecf5fa885bb34eea78739f190ec393"
+    },
+    {
+      "bytes": 23363,
+      "path": "samples.json",
+      "role": "samples",
+      "sha256": "20330c1b9fca87d8b8c111196be4b0ce9a558a11607903c677d29329fcc2fd22"
+    },
+    {
+      "bytes": 4031,
+      "path": "provenance.json",
+      "role": "input",
+      "sha256": "4e839d63f1e460452547cef46d22c48f4cd1d0cc8682583f0b91a9e8c3d6bc2b"
+    },
+    {
+      "bytes": 1158,
+      "path": "source-files.json",
+      "role": "input",
+      "sha256": "d6ff1c11d3917965a9f5752f341679776b023ac4ff98886cd32b28a813869b5f"
+    },
+    {
+      "bytes": 52036,
+      "path": "source.patch",
+      "role": "source-patch",
+      "sha256": "c3de73ba733b1d6545dfe3474bd9a3d0683aed4a6575b1dcd4d000dbf37ece4b"
+    },
+    {
+      "path": "additional-qualification.json",
+      "role": "summary",
+      "bytes": 35450,
+      "sha256": "470a97cc6b3b31b793c74f303589cc30db169219f4bf4d35dbc04397f23a8c4a"
+    },
+    {
+      "path": "work-admission-qualification.json.gz",
+      "role": "summary",
+      "bytes": 15559,
+      "sha256": "ff77ca9f793cc360325a1e026c504f3dfe69f2a584e26a364c04dd124f683b24"
+    },
+    {
+      "path": "source-work-admission.patch",
+      "role": "source-patch",
+      "bytes": 2771,
+      "sha256": "626e299a1f50ab90288e0b825dc4ec9d3bdfdf4ea985737ec287d943d2302b1f"
+    },
+    {
+      "path": "work-admission-latest-master.json.gz",
+      "role": "summary",
+      "bytes": 6687,
+      "sha256": "aa55118255a020377c5936a38aee093223fecf3f37eb5a60cbb70e1f3a309e1e"
+    },
+    {
+      "path": "work-admission-resident.json.gz",
+      "role": "summary",
+      "bytes": 5920,
+      "sha256": "231e38d82f298473e83ef0daa5950af44be817787598d62c04881fa19588faaa"
+    },
+    {
+      "path": "source-resident-admission.patch",
+      "role": "source-patch",
+      "bytes": 3503,
+      "sha256": "d34e854e913596a86d5d589a6ea913ffbe294801c88df5b6bea4d816aab855fc"
+    },
+    {
+      "path": "storage.json",
+      "role": "reproduction",
+      "bytes": 869,
+      "sha256": "033f1b4d577a5ceb2f7557a0311ecc6067899d451dcfae8b0f8ec8f195be9709"
+    }
+  ],
+  "reproduction": {
+    "command": [
+      "python",
+      "-m",
+      "benchmarks.df_hf_preconvergence",
+      "summarize"
+    ]
+  },
+  "schema": "generativeqc.benchmark-publication.v1",
+  "source": {
+    "dirty": true,
+    "revision": "4e20f7a7bcfbff770fefd13fa2777f8ab309679c"
+  }
+}
