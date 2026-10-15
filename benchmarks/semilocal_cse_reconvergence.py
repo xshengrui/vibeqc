@@ -26,16 +26,27 @@ SCHEMA = "generativeqc.semilocal-cse-reconvergence.v1"
 ARMS = ("baseline", "candidate")
 ENERGY_GATE = 1e-8
 FORCE_GATE = 1e-7
+REFERENCE_CONSUMERS = (
+    "benchmarks/readme_omol25.py",
+    "benchmarks/readme_dft.py",
+    "benchmarks/readme_wb97mv.py",
+    "tools/generativeqc_gcp/reference.py",
+    "tools/parameters/r2scan3c_gcp.json",
+)
 
 
 def digest(path: Path) -> str:
     """Hash retained bytes, streaming large native libraries."""
+    if path.name in (".env", "auth.json"):
+        raise ValueError("credential files cannot be evidence inputs")
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def read_json(path: Path) -> dict:
     """Reject duplicate keys and nonfinite literals before interpreting evidence."""
+    if path.name in (".env", "auth.json"):
+        raise ValueError("credential files cannot be evidence inputs")
 
     def unique(pairs: list) -> dict:
         result = {}
@@ -211,7 +222,31 @@ def reduce_campaign(plan: dict, receipts: list[dict], oracles: dict) -> dict:
             "wall_seconds": seconds,
             "returned": found.get("records", []),
         }
+        returned_checks = []
+        phases = [row.get("phase") for row in item["returned"]]
+        if phases != ["cold", "moved"][: len(phases)]:
+            raise ValueError(
+                "failed/partial journal contains reordered or duplicate phases"
+            )
+        for row in item["returned"]:
+            try:
+                returned_checks.append(
+                    {"phase": row["phase"], **physical_gate(row, oracles[row["phase"]])}
+                )
+            except (TypeError, ValueError):
+                returned_checks.append(
+                    {
+                        "phase": row["phase"],
+                        "gate": None,
+                        "accuracy_status": "UNAVAILABLE",
+                    }
+                )
+        item["returned_checks"] = returned_checks
+        if any(check["gate"] is False for check in returned_checks):
+            item["status"] = "FAIL"
         if status == "completed":
+            if type(found.get("exit_code")) is not int or found["exit_code"] != 0:
+                raise ValueError("completed receipt lacks a successful process exit")
             rows = found.get("records", [])
             if [r.get("phase") for r in rows] != ["cold", "moved"]:
                 raise ValueError(
@@ -241,9 +276,11 @@ def reduce_campaign(plan: dict, receipts: list[dict], oracles: dict) -> dict:
                 moved_fock_builds=rows[1]["fock_builds"],
             )
         observed.append(item)
-    complete = all(r["status"] in ("PASS", "FAIL") for r in observed)
+    complete = all(r.get("execution_status") == "completed" for r in observed)
     overall = (
-        "INCOMPLETE"
+        "FAIL"
+        if any(r["status"] == "FAIL" for r in observed)
+        else "INCOMPLETE"
         if not complete
         else "PASS"
         if all(r["status"] == "PASS" for r in observed)
@@ -264,6 +301,7 @@ def reduce_campaign(plan: dict, receipts: list[dict], oracles: dict) -> dict:
     return {
         "schema": SCHEMA,
         "scientific_status": overall,
+        "execution_completeness": "COMPLETE" if complete else "INCOMPLETE",
         "runs": observed,
         "pairs": pairs,
         "sample_size": len(pairs),
@@ -323,6 +361,7 @@ def audit_campaign_files(
         references.append(reference)
     if references[0] != references[1]:
         raise ValueError("paired arms do not use identical independent references")
+    audit_reference_sources(references[0], Path(bindings["baseline"]["source"]))
     protocol = references[0]["protocol"]
     expected_controls = {
         "atoms": 96,
@@ -364,6 +403,14 @@ def audit_campaign_files(
             if actual.get("protocol") != protocol:
                 raise ValueError("native/reference protocol mismatch")
             build = actual.get("native_build") or {}
+            if receipt.get("status") == "completed" and (
+                actual.get("status") != "measured"
+                or actual.get("stage") != "complete"
+                or not build
+            ):
+                raise ValueError(
+                    "completed receipt lacks terminal measured build evidence"
+                )
             if build:
                 identity = plan["identities"][spec["arm"]]
                 if (
@@ -383,6 +430,32 @@ def audit_campaign_files(
             raise ValueError("completed run missing original journal")
         receipts.append(receipt)
     return receipts, {r["phase"]: r for r in references[0]["records"]}
+
+
+def audit_reference_sources(reference: dict, source: Path) -> None:
+    """Bind the independent oracle consumer and providers to their actual inputs."""
+    hashes = reference.get("source_file_sha256") or {}
+    if not set(REFERENCE_CONSUMERS).issubset(hashes):
+        raise ValueError("independent reference lacks scientific consumer identities")
+    packages = reference.get("environment", {}).get("packages", {})
+    if any(
+        not isinstance(packages.get(name), str)
+        or not packages[name]
+        or packages[name].lower()
+        in {"unknown", "unverified", "unavailable", "not applicable"}
+        for name in ("pyscf", "gpu4pyscf", "cupy", "dftd4")
+    ):
+        raise ValueError("independent reference lacks its actual provider versions")
+    for relative, expected in hashes.items():
+        path = Path(relative)
+        if path.is_absolute() or ".." in path.parts or "\\" in relative:
+            raise ValueError("reference consumer path must stay in its frozen source")
+        actual = source / path
+        if (
+            not actual.resolve().is_relative_to(source.resolve())
+            or digest(actual) != expected
+        ):
+            raise ValueError("independent reference consumer source changed")
 
 
 def run_child(

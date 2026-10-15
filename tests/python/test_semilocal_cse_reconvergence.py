@@ -9,7 +9,9 @@ import unittest
 from pathlib import Path
 
 from benchmarks.semilocal_cse_reconvergence import (
+    REFERENCE_CONSUMERS,
     audit_campaign_files,
+    audit_reference_sources,
     digest,
     make_plan,
     physical_gate,
@@ -77,6 +79,7 @@ def fixtures() -> tuple[dict, list[dict], dict]:
                 "identity": identities[spec["arm"]],
                 "input_sha256": plan["input_sha256"],
                 "status": "completed",
+                "exit_code": 0,
                 "wall_seconds": 24.0,
                 "records": rows,
             }
@@ -101,6 +104,12 @@ class EvidenceTests(unittest.TestCase):
             ]
             for path in (library, patch, basis):
                 path.write_bytes(path.name.encode())
+            consumer_hashes = {}
+            for relative in REFERENCE_CONSUMERS:
+                consumer = source / relative
+                consumer.parent.mkdir(parents=True, exist_ok=True)
+                consumer.write_bytes(b"independently owned oracle consumer")
+                consumer_hashes[relative] = digest(consumer)
             plan, receipts, oracles = fixtures()
             protocol = {
                 "atoms": 96,
@@ -126,6 +135,13 @@ class EvidenceTests(unittest.TestCase):
                     "status": "measured",
                     "protocol": protocol,
                     "records": [{**v, "phase": k} for k, v in oracles.items()],
+                    "source_file_sha256": consumer_hashes,
+                    "environment": {
+                        "packages": {
+                            name: "verified-test-version"
+                            for name in ("pyscf", "gpu4pyscf", "cupy", "dftd4")
+                        }
+                    },
                 },
             )
             identity = {
@@ -164,6 +180,8 @@ class EvidenceTests(unittest.TestCase):
                     journal,
                     {
                         "records": receipt["records"],
+                        "status": "measured",
+                        "stage": "complete",
                         "protocol": protocol,
                         "native_build": {
                             "library_sha256": digest(library),
@@ -184,6 +202,7 @@ class EvidenceTests(unittest.TestCase):
                 source / "mathematics.txt",
                 root / "baseline-0/endpoint.json",
                 root / "baseline-0/cold-seed.npz",
+                source / REFERENCE_CONSUMERS[0],
             ):
                 original = target.read_bytes()
                 target.write_bytes(original + b"changed")
@@ -221,6 +240,19 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(len(result["runs"][0]["returned"]), 2)
         self.assertEqual(result["runs"][-1]["reason"], "missing receipt")
 
+    def test_numerical_failure_is_preserved_when_process_fails_or_times_out(
+        self,
+    ) -> None:
+        for execution in ("failed", "timeout"):
+            plan, receipts, oracles = fixtures()
+            receipts[0].update(status=execution, exit_code=7)
+            receipts[0]["records"][1]["forces"][95][2] = 2e-7
+            result = reduce_campaign(plan, receipts, oracles)
+            self.assertEqual(result["scientific_status"], "FAIL")
+            self.assertEqual(result["execution_completeness"], "INCOMPLETE")
+            self.assertFalse(result["runs"][0]["returned_checks"][1]["gate"])
+            self.assertIsNone(result["moved_medians"])
+
     def test_rejects_identity_order_duplicate_and_incomplete_tail(self) -> None:
         mutations = [
             lambda p, r, o: r.append(copy.deepcopy(r[0])),
@@ -238,6 +270,8 @@ class EvidenceTests(unittest.TestCase):
             lambda p, r, o: r[0]["records"][1].pop("initial_seed"),
             lambda p, r, o: r[0]["records"][1].update(warm_start_used=False),
             lambda p, r, o: r[0]["records"][1].update(warm_start_fallback=True),
+            lambda p, r, o: r[0].update(exit_code=7),
+            lambda p, r, o: r[0].update(exit_code=False),
         ]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
@@ -265,6 +299,36 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     read_json(path)
             json.loads(path.read_text())  # Python's default reader accepts NaN.
+
+    def test_reference_needs_current_sources_and_real_provider_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)
+            hashes = {}
+            for relative in REFERENCE_CONSUMERS:
+                path = source / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("oracle input", encoding="utf-8")
+                hashes[relative] = digest(path)
+            reference = {
+                "source_file_sha256": hashes,
+                "environment": {
+                    "packages": {
+                        name: "test-version"
+                        for name in ("pyscf", "gpu4pyscf", "cupy", "dftd4")
+                    }
+                },
+            }
+            audit_reference_sources(reference, source)
+            for mutate in (
+                lambda r: r["source_file_sha256"].pop(REFERENCE_CONSUMERS[0]),
+                lambda r: r["source_file_sha256"].update({"../outside.py": "a" * 64}),
+                lambda r: r["environment"]["packages"].update(gpu4pyscf=None),
+                lambda r: r["environment"]["packages"].update(gpu4pyscf="unverified"),
+            ):
+                invalid = copy.deepcopy(reference)
+                mutate(invalid)
+                with self.assertRaises(ValueError):
+                    audit_reference_sources(invalid, source)
 
     @unittest.skipUnless(os.name == "posix", "real POSIX process groups required")
     def test_fresh_process_success_failure_and_timeout_cleanup(self) -> None:

@@ -57,6 +57,13 @@ reports missing/failed/timed-out runs as INCOMPLETE. There is no successful
 median for an incomplete or numerically failed population. Per-iteration
 physical energies, delta E, residuals and total Fock work remain unreduced.
 
+Recompute every returned physical gate even when the process later fails or
+times out. A known numerical FAIL remains FAIL with execution completeness
+INCOMPLETE; the failed process must not obscure an already observed physical
+gate failure. A completed receipt additionally needs an integer zero exit,
+terminal measured journal and loaded-build proof. Bind independent-reference
+consumer files and actual provider versions before trusting reference arrays.
+
 First diverging full Fock matrices remain UNAVAILABLE because the existing
 solver does not export each iteration's matrix. Do not modify shared SCF to
 obtain them in this slice. Three pairs support only a small-sample observation;
