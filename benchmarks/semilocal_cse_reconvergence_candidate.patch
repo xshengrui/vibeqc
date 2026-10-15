@@ -1,0 +1,22 @@
+--- a/python/generativeqc_compiler/xc/semilocal_codegen.py
++++ b/python/generativeqc_compiler/xc/semilocal_codegen.py
+@@ -203,7 +203,8 @@
+         return source
+     restricted_roots = equal_spin_roots(graph, roots)
+     restricted_emitter = ScalarCEmitter(
+-        graph, {name: name for name in spec.features}, scalar_type=scalar_type
++        graph, {name: name for name in spec.features}, scalar_type=scalar_type,
++        coalesce_branches=(scalar_type == "double"),
+     )
+     restricted_emitter.emit(restricted_roots)
+     restricted_refs = [restricted_emitter.reference(root) for root in restricted_roots]
+@@ -344,7 +345,8 @@
+         if include_equal_spin:
+             restricted_roots = equal_spin_roots(emitter.graph, roots_for_component[tag])
+             restricted_emitter = ScalarCEmitter(
+-                emitter.graph, emitter.variables, scalar_type=scalar_type
++                emitter.graph, emitter.variables, scalar_type=scalar_type,
++                coalesce_branches=(scalar_type == "double"),
+             )
+             restricted_emitter.emit(restricted_roots)
+             restricted_refs = [
