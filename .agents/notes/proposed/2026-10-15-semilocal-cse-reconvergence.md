@@ -78,6 +78,22 @@ their own explicit evidence; Windows skips are not that evidence.
 No installed library, GPU endpoint result or scientific acceptance is claimed
 by this preparation commit.
 
+### Source materialization boundary
+
+The first e7 native build attempt stopped at the source-inventory guard before
+any compiler request. The earlier Windows `git archive` lacked an explicit
+`-c core.autocrlf=false`: its checkout conversion changed 1739 native-input
+files relative to committed blob bytes. Applying the actual upstream delta
+cannot repair those unrelated line endings. Keep that attempt INCOMPLETE /
+scientific NOT_RUN, even though the scheduler reported SUCCEEDED / one step.
+
+Create the replacement with `git -c core.autocrlf=false archive` and compare
+all 1742 native inputs to the committed source inventory before submission.
+The replacement matches baseline `c51f7fe84b695a9e967ada7ba27f4114074aa9f81ae7ce163ca620d0506f6173`.
+Do not blindly normalize all files: two vendored Windows license files have
+intentional committed CRLF bytes. Historical archives and the failed build
+journal remain in ignored storage; no compiler-cache cleanup is required.
+
 ## Revisit when
 
 Only source-matched independent observations can inform later numerical
