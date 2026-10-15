@@ -17,7 +17,12 @@ calls); neither has a complete moved-warm median. Direct/96 warm was
 
 ## Bounded experiment
 
-Freeze merged source df4bee32a45f1c69bbef9210ca2f58455230a720. The tracked
+Freeze merged source e7c863d96c300ca3e17733532e7224ec3a19a02d before formal
+native qualification. Initial preparation at df4bee32a45f1c69bbef9210ca2f58455230a720
+produced host/Libxc point controls only; its receipts remain separately identified.
+The integration includes merged #2511 force-consumer lowering, so neither arm
+may reuse an earlier-source library or call its controls current-source results.
+The tracked
 experimental patch applies only in isolated source snapshots and enables the
 existing ScalarCEmitter coalesce_branches API for FP64 semilocal equal-spin
 emission. It changes no production default, thresholds, grid or force policy.
