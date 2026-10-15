@@ -94,6 +94,22 @@ Do not blindly normalize all files: two vendored Windows license files have
 intentional committed CRLF bytes. Historical archives and the failed build
 journal remain in ignored storage; no compiler-cache cleanup is required.
 
+### Target admission boundary
+
+The corrected LF attempt froze both exact native identities and passed 53
+independent host/Libxc controls per arm without skips. Configuration completed,
+but production-shell generation rejected the explicit `sm_90` profile. The
+frozen production shell manifest admits tuned `sm_120` and explicit
+`portable_cuda`; `auto` on `sm_90` has no tuned/compatible profile.
+
+This is an admission limit, not evidence of a semilocal numerical failure.
+The C tuning descriptor reports the generated shell registry's actual
+`official_profile` and `portable` fields. The inherited README endpoint rejects
+portable builds. Do not relabel a portable H100 observation as tuned or silently
+bypass this consumer check. The2026-10-15 qz Job quota snapshot listed only
+H100/H200; an unchanged tuned protocol needs another authorized target, while
+portable-only diagnostics need a distinct, explicit protocol disposition.
+
 ## Revisit when
 
 Only source-matched independent observations can inform later numerical
