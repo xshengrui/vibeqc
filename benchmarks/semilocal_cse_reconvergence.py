@@ -227,6 +227,13 @@ def reduce_campaign(plan: dict, receipts: list[dict], oracles: dict) -> dict:
             seed = rows[1].get("initial_seed")
             if not isinstance(seed, dict) or seed.get("owner") != spec["owner"]:
                 raise ValueError("missing independently retained moved seed")
+            if (
+                rows[1].get("warm_start_used") is not True
+                or rows[1].get("warm_start_fallback") is not False
+            ):
+                raise ValueError(
+                    "moved solve did not consume the retained seed without fallback"
+                )
             item.update(
                 status="PASS" if all(c["gate"] for c in checks) else "FAIL",
                 checks=checks,
@@ -331,6 +338,16 @@ def audit_campaign_files(
     }
     if any(protocol.get(k) != v for k, v in expected_controls.items()):
         raise ValueError("reference does not use the unchanged bounded protocol")
+    grid = protocol.get("grid") or {}
+    if any(
+        grid.get(k) != v
+        for k, v in {
+            "radial_points": 48,
+            "angular_polar": 16,
+            "angular_azimuth": 32,
+        }.items()
+    ):
+        raise ValueError("reference grid differs from preregistered grid")
     receipts = []
     for spec in plan["runs"]:
         receipt_path = directory / f"{spec['run_id']}.receipt.json"

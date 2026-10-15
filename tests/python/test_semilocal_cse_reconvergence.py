@@ -70,6 +70,7 @@ def fixtures() -> tuple[dict, list[dict], dict]:
             "file": "cold-seed.npz",
             "sha256": "e" * 64,
         }
+        rows[1].update(warm_start_used=True, warm_start_fallback=False)
         receipts.append(
             {
                 **spec,
@@ -112,6 +113,11 @@ class EvidenceTests(unittest.TestCase):
                 "force_gate": 1e-7,
                 "repeats": 0,
                 "max_iterations": 100,
+                "grid": {
+                    "radial_points": 48,
+                    "angular_polar": 16,
+                    "angular_azimuth": 32,
+                },
             }
             save_new(
                 reference,
@@ -230,6 +236,8 @@ class EvidenceTests(unittest.TestCase):
             lambda p, r, o: p.update(energy_gate=1e-5),
             lambda p, r, o: o.pop("moved"),
             lambda p, r, o: r[0]["records"][1].pop("initial_seed"),
+            lambda p, r, o: r[0]["records"][1].update(warm_start_used=False),
+            lambda p, r, o: r[0]["records"][1].update(warm_start_fallback=True),
         ]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
