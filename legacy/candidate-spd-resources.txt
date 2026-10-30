@@ -1,0 +1,980 @@
+
+Fatbin elf code:
+================
+arch = sm_90
+code version = [1,7]
+host = linux
+compile_size = 64bit
+compressed
+
+Resource usage:
+ Common:
+  GLOBAL:392 CONSTANT[3]:48
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_0_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_0_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_0jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_1_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_1_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_1jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_2_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_2_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_2jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_3_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_3_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_3jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_4_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_4_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_4jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_5_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_5_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_5jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_6_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_6_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_6jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_7_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_7_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_7jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_8_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_8_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_8jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_9_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z36first_derivative_shard_9_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z24first_derivative_shard_9jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_10_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_10_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_10jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_11_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_11_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_11jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_12_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_12_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_12jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_13_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_13_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_13jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_14_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_14_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_14jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_15_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_15_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_15jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_16_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_16_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_16jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_17_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_17_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_17jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_18_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_18_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_18jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __internal_accurate_pow:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dblrcp_rn_slowpath_v3:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_19_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_19_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_19jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __internal_accurate_pow:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dblrcp_rn_slowpath_v3:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_20_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_20_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_20jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __internal_accurate_pow:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dblrcp_rn_slowpath_v3:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_14PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_10PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_12PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_15PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_11PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z38first_derivative_shard_21_primitive_13PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_21_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_21jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __internal_accurate_pow:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dblrcp_rn_slowpath_v3:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_5PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_0PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_8PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_7PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_3PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_2PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_6PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_1PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_9PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z37first_derivative_shard_22_primitive_4PKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _Z25first_derivative_shard_22jPKdS0_Pd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __nv_static_61__526985e7_39_generativeqc_stationary_pbe0_rks_spd_cu_5723c545__ZN19generativeqc_tensor32accumulate_fp32_into_fp64_kernelEPKfPdlddPii:
+  REG:18 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:580 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __nv_static_61__526985e7_39_generativeqc_stationary_pbe0_rks_spd_cu_5723c545__ZN19generativeqc_tensor27convert_fp64_to_fp32_kernelEPKdPflPii:
+  REG:14 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:564 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __nv_static_61__526985e7_39_generativeqc_stationary_pbe0_rks_spd_cu_5723c545__ZN19generativeqc_tensor11check_scaleEPflfPii:
+  REG:16 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:564 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __nv_static_61__526985e7_39_generativeqc_stationary_pbe0_rks_spd_cu_5723c545__ZN19generativeqc_tensor11check_scaleEPdldPii:
+  REG:18 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:564 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __internal_accurate_pow:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dblrcp_rn_slowpath_v3:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_dsqrt_rn_f64_mediumpath_v1:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_rn_f64_full:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_div_u64:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda22phased_becke_normalizeILb0EEEvNS_16PhasedBeckeInputE:
+  REG:44 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda22phased_becke_normalizeILb1EEEvNS_16PhasedBeckeInputE:
+  REG:56 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_rem_u64:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda34phased_becke_normalize_cooperativeILb1EEEvNS_16PhasedBeckeInputE:
+  REG:51 STACK:0 SHARED:10472 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda34phased_becke_normalize_cooperativeILb0EEEvNS_16PhasedBeckeInputE:
+  REG:51 STACK:0 SHARED:10472 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi3ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:47 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb1ELb0ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:58 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb1ELb0ELb0ELb1EEEvNS_16PhasedBeckeInputE:
+  REG:62 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi2ELb1ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:32 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi2ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:32 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb1ELb1ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:50 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb1ELb0ELb1ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:64 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi1ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:26 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi1ELb0ELb1EEEvNS_16PhasedBeckeInputE:
+  REG:22 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb0ELb0ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:34 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_pairILb0ELb0ELb0ELb1EEEvNS_16PhasedBeckeInputE:
+  REG:35 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda17phased_becke_atomILi0ELb0ELb0EEEvNS_16PhasedBeckeInputE:
+  REG:44 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:680 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda15geometry_kernelIdEEvN12generativeqc3dft12GridTaskViewEPKdPKlS7_mmS5_mS5_S5_S5_mmmPdS8_PKN25generativeqc_grid_adjoint10CenterPairEPibS5_:
+  REG:255 STACK:192 SHARED:0 LOCAL:0 CONSTANT[0]:792 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda27geometry_cooperative_kernelILb0EdEEvN12generativeqc3dft12GridTaskViewEPKdPKlS7_mmS5_mS5_S5_S5_mmmPdS8_PKN25generativeqc_grid_adjoint10CenterPairEPiS8_bS5_:
+  REG:255 STACK:288 SHARED:1040 LOCAL:0 CONSTANT[0]:800 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda27geometry_cooperative_kernelILb1EdEEvN12generativeqc3dft12GridTaskViewEPKdPKlS7_mmS5_mS5_S5_S5_mmmPdS8_PKN25generativeqc_grid_adjoint10CenterPairEPiS8_bS5_:
+  REG:92 STACK:0 SHARED:1040 LOCAL:0 CONSTANT[0]:800 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda21geometry_point_kernelILb0EEEvN12generativeqc3dft12GridTaskViewEPKlmmmPKdS7_S7_mmPdS8_Pi:
+  REG:254 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:736 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda21geometry_point_kernelILb1EEEvN12generativeqc3dft12GridTaskViewEPKlmmmPKdS7_S7_mmPdS8_Pi:
+  REG:156 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:736 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_rcp_rn_f32_slowpath:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm20_sqrt_rn_f32_slowpath:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function __cuda_sm3x_div_rn_noftz_f32_slowpath:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda15geometry_kernelIfEEvN12generativeqc3dft12GridTaskViewEPKdPKlS7_mmS5_mS5_S5_S5_mmmPdS8_PKN25generativeqc_grid_adjoint10CenterPairEPibS5_:
+  REG:255 STACK:200 SHARED:0 LOCAL:0 CONSTANT[0]:792 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN12generativeqc3dft5point8evaluateEbPKdPA3_S2_dd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN12generativeqc3dft5point22evaluate_with_channelsILj8ELb0EffEENS1_5ValueEbPKdPA3_S4_dd:
+  REG:0 STACK:0 SHARED:0 LOCAL:0 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda27geometry_cooperative_kernelILb0EfEEvN12generativeqc3dft12GridTaskViewEPKdPKlS7_mmS5_mS5_S5_S5_mmmPdS8_PKN25generativeqc_grid_adjoint10CenterPairEPiS8_bS5_:
+  REG:255 STACK:976 SHARED:1040 LOCAL:0 CONSTANT[0]:800 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda13source_reduceEPKdmPdPi:
+  REG:28 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:560 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda15geometry_reduceEPKdmmPdPi:
+  REG:28 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:568 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda16validate_centersEPKdmdPN25generativeqc_grid_adjoint10CenterPairEPi:
+  REG:50 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:568 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda18nuclear_all_kernelEjPKdS1_mPdPi:
+  REG:255 STACK:6216 SHARED:0 LOCAL:0 CONSTANT[0]:576 CONSTANT[2]:1912 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda14nuclear_kernelEjllddPKdmPdPi:
+  REG:255 STACK:6216 SHARED:0 LOCAL:0 CONSTANT[0]:600 CONSTANT[2]:1912 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda11task_reduceEPKdPKlmS3_mPdPi:
+  REG:38 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:584 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda11task_kernelEPKlPKdmS3_mS1_S3_S1_S3_S3_S3_mmPdPi:
+  REG:255 STACK:6280 SHARED:0 LOCAL:0 CONSTANT[2]:1912 CONSTANT[0]:648 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda22stationary_grid_ownersEPKmmmmPl:
+  REG:18 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:568 TEXTURE:0 SURFACE:0 SAMPLER:0
+ Function _ZN28generativeqc_stationary_cuda20phased_becke_indicesEmP5uint2:
+  REG:11 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:544 TEXTURE:0 SURFACE:0 SAMPLER:0

@@ -1,0 +1,2171 @@
+{
+  "schema": "generativeqc.h100-pbe0-becke-interleaved-summary.v1",
+  "status": "PASS_SCOPED_NATIVE_PAIRS",
+  "campaign_sha256": "ab923771111e7ac70397dcb34b65958252bd05accb0916f58684c03151ab7972",
+  "population_count": 48,
+  "processes_per_variant_group": 3,
+  "warm_calls_per_process": 3,
+  "device": {
+    "name": "NVIDIA H100 80GB HBM3",
+    "compute_capability": "9.0",
+    "mig": "Disabled",
+    "driver": "595.58.03",
+    "memory_total": "81559 MiB",
+    "power_limit": "700.00 W",
+    "sampled_memory_used": [
+      "0 MiB"
+    ],
+    "sampled_sm_clocks": [
+      "1980 MHz",
+      "345 MHz"
+    ]
+  },
+  "probe_sha256": "381caa801d8b278869658764637df5fd92a8bd94b5de0079299b4d3fe54b17d8",
+  "source_revision": "cbd4d8074de35105717c8aac7cd1f86babbe90ec",
+  "driver_sha256": "74f61cc0eb9d1afb54e210eefb2620bbf01e91c2e02d55e5fbe65fbfc88c9055",
+  "library_sha256": "5645dacffe534cff08bd5cc042eefc9ab1f5335cced0f16220387eefd61a38df",
+  "candidate_planner_sha256": "8f759ab9864cb811adc67c79348430b66aa532f600cfdfb13f86a5a958d46aee",
+  "gates": {
+    "energy_abs_per_atom_hartree": 1e-05,
+    "force_max_abs_hartree_per_bohr": 0.0001,
+    "force_rms_hartree_per_bohr": 3e-05
+  },
+  "groups": [
+    {
+      "atoms": 48,
+      "mode": "direct",
+      "arm": "standard",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            25.021871326011023,
+            19.869071388995508,
+            18.859410938996007
+          ],
+          "median": 19.869071388995508,
+          "range": [
+            18.859410938996007,
+            25.021871326011023
+          ],
+          "population_standard_deviation": 2.698696793242776
+        },
+        "cold_work": [
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            6.3552289020008175,
+            6.345222456002375,
+            6.3561872849968495
+          ],
+          [
+            6.348384842000087,
+            6.3507658500020625,
+            6.347168896987569
+          ],
+          [
+            6.327616502996534,
+            6.325735147998785,
+            6.322514324012445
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            6.3552289020008175,
+            6.348384842000087,
+            6.325735147998785
+          ],
+          "median": 6.348384842000087,
+          "range": [
+            6.325735147998785,
+            6.3552289020008175
+          ],
+          "population_standard_deviation": 0.012603929373099173
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9692145157393196e-07,
+          "force_max_abs_hartree_per_bohr": 2.2400437227287906e-05,
+          "force_rms_hartree_per_bohr": 1.086575989042417e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        },
+        "scf_seconds": {
+          "values": [
+            1.4844947859965032,
+            1.4838790299982065,
+            1.4838309439946897
+          ],
+          "median": 1.4838790299982065,
+          "range": [
+            1.4838309439946897,
+            1.4844947859965032
+          ],
+          "population_standard_deviation": 0.0003022423451000584
+        },
+        "force_seconds": {
+          "values": [
+            4.85244967599283,
+            4.863804049004102,
+            4.853021824004827
+          ],
+          "median": 4.853021824004827,
+          "range": [
+            4.85244967599283,
+            4.863804049004102
+          ],
+          "population_standard_deviation": 0.005222871876677892
+        },
+        "becke_threads_per_point": [
+          1
+        ],
+        "becke_pair_state_evaluations": [
+          1216363008
+        ]
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            19.22108135500457,
+            15.833866038010456,
+            15.795132008992368
+          ],
+          "median": 15.833866038010456,
+          "range": [
+            15.795132008992368,
+            19.22108135500457
+          ],
+          "population_standard_deviation": 1.605956165519296
+        },
+        "cold_work": [
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            2.96484936401248,
+            2.948286624989123,
+            2.9421934870042605
+          ],
+          [
+            2.968141082994407,
+            2.9597542730043642,
+            2.9499921889946563
+          ],
+          [
+            2.950223947002087,
+            2.9465835520095425,
+            2.93799185899843
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            2.948286624989123,
+            2.9597542730043642,
+            2.9465835520095425
+          ],
+          "median": 2.948286624989123,
+          "range": [
+            2.9465835520095425,
+            2.9597542730043642
+          ],
+          "population_standard_deviation": 0.005848791898984876
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9692145157393196e-07,
+          "force_max_abs_hartree_per_bohr": 2.240043722417928e-05,
+          "force_rms_hartree_per_bohr": 1.0865759890797249e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        },
+        "scf_seconds": {
+          "values": [
+            1.483180409995839,
+            1.4842711639939807,
+            1.4837869329930982
+          ],
+          "median": 1.4837869329930982,
+          "range": [
+            1.483180409995839,
+            1.4842711639939807
+          ],
+          "population_standard_deviation": 0.00044623039550863787
+        },
+        "force_seconds": {
+          "values": [
+            1.4705344980029622,
+            1.474103857006412,
+            1.4622276769950986
+          ],
+          "median": 1.4705344980029622,
+          "range": [
+            1.4622276769950986,
+            1.474103857006412
+          ],
+          "population_standard_deviation": 0.004975353148976938
+        },
+        "becke_threads_per_point": [
+          128
+        ],
+        "becke_pair_state_evaluations": [
+          1216363008
+        ]
+      },
+      "cold_speedup": 1.2548465006144565,
+      "warm_speedup": 2.1532454776249943
+    },
+    {
+      "atoms": 48,
+      "mode": "direct",
+      "arm": "fast",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            16.746510469005443,
+            17.74208593800722,
+            16.59590629299055
+          ],
+          "median": 16.746510469005443,
+          "range": [
+            16.59590629299055,
+            17.74208593800722
+          ],
+          "population_standard_deviation": 0.5085469399247868
+        },
+        "cold_work": [
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            5.939761091998662,
+            5.935321901997668,
+            5.953841077993275
+          ],
+          [
+            6.004175024005235,
+            6.006620210988331,
+            5.977618753007846
+          ],
+          [
+            5.972177921998082,
+            5.94944532700174,
+            5.961308668993297
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            5.939761091998662,
+            6.004175024005235,
+            5.961308668993297
+          ],
+          "median": 5.961308668993297,
+          "range": [
+            5.939761091998662,
+            6.004175024005235
+          ],
+          "population_standard_deviation": 0.02677265832253473
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9697964976094227e-07,
+          "force_max_abs_hartree_per_bohr": 2.2339173335800266e-05,
+          "force_rms_hartree_per_bohr": 1.0864300036302786e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        }
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            13.399106716999086,
+            13.272851308007375,
+            13.474592464990565
+          ],
+          "median": 13.399106716999086,
+          "range": [
+            13.272851308007375,
+            13.474592464990565
+          ],
+          "population_standard_deviation": 0.0832252771901615
+        },
+        "cold_work": [
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            2.5656944859947544,
+            2.565262567004538,
+            2.5739879659959115
+          ],
+          [
+            2.5710166839999147,
+            2.5820211509999353,
+            2.5752288950025104
+          ],
+          [
+            2.586391499004094,
+            2.566124918012065,
+            2.5839560109889135
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            2.5656944859947544,
+            2.5752288950025104,
+            2.5839560109889135
+          ],
+          "median": 2.5752288950025104,
+          "range": [
+            2.5656944859947544,
+            2.5839560109889135
+          ],
+          "population_standard_deviation": 0.007457664243206521
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9697964976094227e-07,
+          "force_max_abs_hartree_per_bohr": 2.2339173343349783e-05,
+          "force_rms_hartree_per_bohr": 1.086430003344013e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        }
+      },
+      "cold_speedup": 1.249822904071627,
+      "warm_speedup": 2.3148655564411436
+    },
+    {
+      "atoms": 48,
+      "mode": "df",
+      "arm": "standard",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            18.43052659300156,
+            17.637000379007077,
+            17.710424689998035
+          ],
+          "median": 17.710424689998035,
+          "range": [
+            17.637000379007077,
+            18.43052659300156
+          ],
+          "population_standard_deviation": 0.35802261450146955
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            9.411186144003295,
+            9.416321408003569,
+            9.47836728200491
+          ],
+          [
+            9.387551306994283,
+            9.444768674002262,
+            9.388895943993703
+          ],
+          [
+            9.407357057003537,
+            9.390239821994328,
+            9.431125079005142
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            9.416321408003569,
+            9.388895943993703,
+            9.407357057003537
+          ],
+          "median": 9.407357057003537,
+          "range": [
+            9.388895943993703,
+            9.416321408003569
+          ],
+          "population_standard_deviation": 0.011417960309043882
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 8.97208944176479e-08,
+          "force_max_abs_hartree_per_bohr": 2.2938174218931073e-05,
+          "force_rms_hartree_per_bohr": 1.0038367509801396e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        },
+        "scf_seconds": {
+          "values": [
+            0.1209625990013592,
+            0.1208091209991835,
+            0.12116068099567201
+          ],
+          "median": 0.1209625990013592,
+          "range": [
+            0.1208091209991835,
+            0.12116068099567201
+          ],
+          "population_standard_deviation": 0.00014390830597362257
+        },
+        "force_seconds": {
+          "values": [
+            9.33279971498996,
+            9.321564050987945,
+            9.266419770996436
+          ],
+          "median": 9.321564050987945,
+          "range": [
+            9.266419770996436,
+            9.33279971498996
+          ],
+          "population_standard_deviation": 0.029008482908609173
+        },
+        "becke_threads_per_point": [
+          1
+        ],
+        "becke_pair_state_evaluations": [
+          1216363008
+        ]
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            10.4534872140066,
+            10.31090511099319,
+            10.35496706199774
+          ],
+          "median": 10.35496706199774,
+          "range": [
+            10.31090511099319,
+            10.4534872140066
+          ],
+          "population_standard_deviation": 0.05960735597586643
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            1.9466538010019576,
+            1.8980719599931035,
+            1.919030378005118
+          ],
+          [
+            1.928703539990238,
+            1.8964318719954463,
+            1.9059493169916095
+          ],
+          [
+            1.8872129449882777,
+            1.8951202850003028,
+            1.9135168329958105
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            1.919030378005118,
+            1.9059493169916095,
+            1.8951202850003028
+          ],
+          "median": 1.9059493169916095,
+          "range": [
+            1.8951202850003028,
+            1.919030378005118
+          ],
+          "population_standard_deviation": 0.009775676382434532
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 8.97208944176479e-08,
+          "force_max_abs_hartree_per_bohr": 2.2938174291081692e-05,
+          "force_rms_hartree_per_bohr": 1.0038367508180302e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        },
+        "scf_seconds": {
+          "values": [
+            0.12089610699331388,
+            0.12183224699401762,
+            0.12077099300222471
+          ],
+          "median": 0.12089610699331388,
+          "range": [
+            0.12077099300222471,
+            0.12183224699401762
+          ],
+          "population_standard_deviation": 0.00047355295923244507
+        },
+        "force_seconds": {
+          "values": [
+            1.8016702340100892,
+            1.779658572995686,
+            1.7689646879880456
+          ],
+          "median": 1.779658572995686,
+          "range": [
+            1.7689646879880456,
+            1.8016702340100892
+          ],
+          "population_standard_deviation": 0.01361586141139828
+        },
+        "becke_threads_per_point": [
+          128
+        ],
+        "becke_pair_state_evaluations": [
+          1216363008
+        ]
+      },
+      "cold_speedup": 1.7103313399223152,
+      "warm_speedup": 4.9357855285744465
+    },
+    {
+      "atoms": 48,
+      "mode": "df",
+      "arm": "fast",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            17.6758652790013,
+            17.524876331997802,
+            17.675749724003254
+          ],
+          "median": 17.675749724003254,
+          "range": [
+            17.524876331997802,
+            17.6758652790013
+          ],
+          "population_standard_deviation": 0.07114965127220943
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            9.431934596999781,
+            9.387314002000494,
+            9.380880541008082
+          ],
+          [
+            9.424256821002928,
+            9.377084232008201,
+            9.429824840000947
+          ],
+          [
+            9.438466827996308,
+            9.424681810996844,
+            9.430866188995424
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            9.387314002000494,
+            9.424256821002928,
+            9.430866188995424
+          ],
+          "median": 9.424256821002928,
+          "range": [
+            9.387314002000494,
+            9.430866188995424
+          ],
+          "population_standard_deviation": 0.019163763876267857
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 8.97208944176479e-08,
+          "force_max_abs_hartree_per_bohr": 2.29381742567758e-05,
+          "force_rms_hartree_per_bohr": 1.0038367507414023e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        }
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            10.099991263996344,
+            10.008180532997358,
+            10.070272130004014
+          ],
+          "median": 10.070272130004014,
+          "range": [
+            10.008180532997358,
+            10.099991263996344
+          ],
+          "population_standard_deviation": 0.03825035028257812
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            1.9012485120038036,
+            1.8996172519982792,
+            1.9153866249980638
+          ],
+          [
+            1.9038126230007038,
+            1.9030493660102366,
+            1.9004506879864493
+          ],
+          [
+            1.895658810986788,
+            1.9028997639979934,
+            1.897615339999902
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            1.9012485120038036,
+            1.9030493660102366,
+            1.897615339999902
+          ],
+          "median": 1.9012485120038036,
+          "range": [
+            1.897615339999902,
+            1.9030493660102366
+          ],
+          "population_standard_deviation": 0.0022600799554050055
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 8.97208944176479e-08,
+          "force_max_abs_hartree_per_bohr": 2.2938174221664998e-05,
+          "force_rms_hartree_per_bohr": 1.003836750829275e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        }
+      },
+      "cold_speedup": 1.7552405233756287,
+      "warm_speedup": 4.956877947044554
+    },
+    {
+      "atoms": 96,
+      "mode": "direct",
+      "arm": "standard",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            74.15596546899178,
+            74.26893109199591,
+            74.11710080200282
+          ],
+          "median": 74.15596546899178,
+          "range": [
+            74.11710080200282,
+            74.26893109199591
+          ],
+          "population_standard_deviation": 0.06439818085789734
+        },
+        "cold_work": [
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            38.72505887299485,
+            38.753421806002734,
+            38.74188524899364
+          ],
+          [
+            38.68978425599926,
+            38.717972775993985,
+            38.7315565530007
+          ],
+          [
+            38.698542691010516,
+            38.72313362399291,
+            38.799169381003594
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            38.74188524899364,
+            38.717972775993985,
+            38.72313362399291
+          ],
+          "median": 38.72313362399291,
+          "range": [
+            38.717972775993985,
+            38.74188524899364
+          ],
+          "population_standard_deviation": 0.010274370254804363
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.974078843938817e-07,
+          "force_max_abs_hartree_per_bohr": 2.2545738302320872e-05,
+          "force_rms_hartree_per_bohr": 1.089615966644456e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        },
+        "scf_seconds": {
+          "values": [
+            5.800401279004291,
+            5.800999219994992,
+            5.798704293003539
+          ],
+          "median": 5.800401279004291,
+          "range": [
+            5.798704293003539,
+            5.800999219994992
+          ],
+          "population_standard_deviation": 0.0009720530856108818
+        },
+        "force_seconds": {
+          "values": [
+            32.932405045008636,
+            32.931525734005845,
+            32.91555650900409
+          ],
+          "median": 32.931525734005845,
+          "range": [
+            32.91555650900409,
+            32.932405045008636
+          ],
+          "population_standard_deviation": 0.0077435457030192905
+        },
+        "becke_threads_per_point": [
+          1
+        ],
+        "becke_pair_state_evaluations": [
+          9834424320
+        ]
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            45.97581210100907,
+            45.83743628500088,
+            46.01226240799588
+          ],
+          "median": 45.97581210100907,
+          "range": [
+            45.83743628500088,
+            46.01226240799588
+          ],
+          "population_standard_deviation": 0.07530727028265867
+        },
+        "cold_work": [
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            11.103681257009157,
+            11.122397374987486,
+            11.171027698001126
+          ],
+          [
+            11.10979949698958,
+            11.165865165006835,
+            11.197095703013474
+          ],
+          [
+            11.071467402987764,
+            11.089580148996902,
+            11.12107444999856
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            11.122397374987486,
+            11.165865165006835,
+            11.089580148996902
+          ],
+          "median": 11.122397374987486,
+          "range": [
+            11.089580148996902,
+            11.165865165006835
+          ],
+          "population_standard_deviation": 0.03124423992873475
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.974078843938817e-07,
+          "force_max_abs_hartree_per_bohr": 2.254573833784801e-05,
+          "force_rms_hartree_per_bohr": 1.0896159664561675e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        },
+        "scf_seconds": {
+          "values": [
+            5.801611073999084,
+            5.795970450999448,
+            5.760660597996321
+          ],
+          "median": 5.795970450999448,
+          "range": [
+            5.760660597996321,
+            5.801611073999084
+          ],
+          "population_standard_deviation": 0.01812163786986694
+        },
+        "force_seconds": {
+          "values": [
+            5.303068963999976,
+            5.349561663009808,
+            5.312039789001574
+          ],
+          "median": 5.312039789001574,
+          "range": [
+            5.303068963999976,
+            5.349561663009808
+          ],
+          "population_standard_deviation": 0.020138238341572835
+        },
+        "becke_threads_per_point": [
+          128
+        ],
+        "becke_pair_state_evaluations": [
+          9834424320
+        ]
+      },
+      "cold_speedup": 1.6129343252506512,
+      "warm_speedup": 3.4815455983505066
+    },
+    {
+      "atoms": 96,
+      "mode": "direct",
+      "arm": "fast",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            64.96056811399467,
+            65.06675383799302,
+            65.11650150299829
+          ],
+          "median": 65.06675383799302,
+          "range": [
+            64.96056811399467,
+            65.11650150299829
+          ],
+          "population_standard_deviation": 0.0650345719689709
+        },
+        "cold_work": [
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            37.02605251999921,
+            37.01752462198783,
+            37.05943779699737
+          ],
+          [
+            37.246118716997444,
+            37.28274031099863,
+            37.329993802006356
+          ],
+          [
+            37.26977400200849,
+            37.26594385600765,
+            37.305304444002104
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            37.02605251999921,
+            37.28274031099863,
+            37.26977400200849
+          ],
+          "median": 37.26977400200849,
+          "range": [
+            37.02605251999921,
+            37.28274031099863
+          ],
+          "population_standard_deviation": 0.1180663222326001
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9744965956979286e-07,
+          "force_max_abs_hartree_per_bohr": 2.2574926452273436e-05,
+          "force_rms_hartree_per_bohr": 1.0965531555462894e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        }
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            36.85333057399839,
+            36.98849791099201,
+            37.24428549299773
+          ],
+          "median": 36.98849791099201,
+          "range": [
+            36.85333057399839,
+            37.24428549299773
+          ],
+          "population_standard_deviation": 0.16211903883945636
+        },
+        "cold_work": [
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            9.581086036996567,
+            9.60001488099806,
+            9.654613872000482
+          ],
+          [
+            9.665762910008198,
+            9.685684537005727,
+            9.718777944988688
+          ],
+          [
+            9.594192299991846,
+            9.660940899004345,
+            9.730085524992319
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            9.60001488099806,
+            9.685684537005727,
+            9.660940899004345
+          ],
+          "median": 9.660940899004345,
+          "range": [
+            9.60001488099806,
+            9.685684537005727
+          ],
+          "population_standard_deviation": 0.03599925501099153
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 2.9744965956979286e-07,
+          "force_max_abs_hartree_per_bohr": 2.257492644516801e-05,
+          "force_rms_hartree_per_bohr": 1.0965531554276365e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        }
+      },
+      "cold_speedup": 1.7591077635693038,
+      "warm_speedup": 3.8577789049355955
+    },
+    {
+      "atoms": 96,
+      "mode": "df",
+      "arm": "standard",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            93.36677100800443,
+            94.04598423599964,
+            93.96191035400261
+          ],
+          "median": 93.96191035400261,
+          "range": [
+            93.36677100800443,
+            94.04598423599964
+          ],
+          "population_standard_deviation": 0.30232246725656214
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            66.40549526800169,
+            66.42748539500462,
+            65.9942589179991
+          ],
+          [
+            65.98556885600556,
+            66.30044406099478,
+            65.9950384459953
+          ],
+          [
+            66.36585933600145,
+            66.0785949830024,
+            66.35428607699578
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            66.40549526800169,
+            65.9950384459953,
+            66.35428607699578
+          ],
+          "median": 66.35428607699578,
+          "range": [
+            65.9950384459953,
+            66.40549526800169
+          ],
+          "population_standard_deviation": 0.18262166244710784
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 9.082205565391632e-08,
+          "force_max_abs_hartree_per_bohr": 2.309399202198026e-05,
+          "force_rms_hartree_per_bohr": 1.0072864449620765e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        },
+        "scf_seconds": {
+          "values": [
+            0.43837746100325603,
+            0.4409129160048906,
+            0.44107985000300687
+          ],
+          "median": 0.4409129160048906,
+          "range": [
+            0.43837746100325603,
+            0.44107985000300687
+          ],
+          "population_standard_deviation": 0.001236451253970862
+        },
+        "force_seconds": {
+          "values": [
+            65.54631817899644,
+            65.83849212698988,
+            65.91198857899872
+          ],
+          "median": 65.83849212698988,
+          "range": [
+            65.54631817899644,
+            65.91198857899872
+          ],
+          "population_standard_deviation": 0.1579318368374925
+        },
+        "becke_threads_per_point": [
+          1
+        ],
+        "becke_pair_state_evaluations": [
+          9834424320
+        ]
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            37.15362505200028,
+            37.11737897900457,
+            37.68399098100781
+          ],
+          "median": 37.15362505200028,
+          "range": [
+            37.11737897900457,
+            37.68399098100781
+          ],
+          "population_standard_deviation": 0.2589832592774525
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            9.65719848399749,
+            9.678264356,
+            9.60335670899076
+          ],
+          [
+            9.654664007990505,
+            9.731439370007138,
+            9.716394383998704
+          ],
+          [
+            9.707107836991781,
+            9.997427117996267,
+            9.816831927993917
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            9.65719848399749,
+            9.716394383998704,
+            9.816831927993917
+          ],
+          "median": 9.716394383998704,
+          "range": [
+            9.65719848399749,
+            9.816831927993917
+          ],
+          "population_standard_deviation": 0.06589106436038897
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 9.082205565391632e-08,
+          "force_max_abs_hartree_per_bohr": 2.3093992032749422e-05,
+          "force_rms_hartree_per_bohr": 1.007286445005284e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        },
+        "scf_seconds": {
+          "values": [
+            0.44065300199144986,
+            0.4413868980045663,
+            0.44225344600272365
+          ],
+          "median": 0.4413868980045663,
+          "range": [
+            0.44065300199144986,
+            0.44225344600272365
+          ],
+          "population_standard_deviation": 0.0006541262046425724
+        },
+        "force_seconds": {
+          "values": [
+            9.256209650993696,
+            9.231781334005063,
+            9.353794775001006
+          ],
+          "median": 9.256209650993696,
+          "range": [
+            9.231781334005063,
+            9.353794775001006
+          ],
+          "population_standard_deviation": 0.05271187814914162
+        },
+        "becke_threads_per_point": [
+          128
+        ],
+        "becke_pair_state_evaluations": [
+          9834424320
+        ]
+      },
+      "cold_speedup": 2.5290105668691374,
+      "warm_speedup": 6.829105885849006
+    },
+    {
+      "atoms": 96,
+      "mode": "df",
+      "arm": "fast",
+      "baseline": {
+        "cold_seconds": {
+          "values": [
+            93.6039062350028,
+            93.63553887199669,
+            94.0810051120061
+          ],
+          "median": 93.63553887199669,
+          "range": [
+            93.6039062350028,
+            94.0810051120061
+          ],
+          "population_standard_deviation": 0.2178338136054685
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            66.37408934198902,
+            66.36538350500632,
+            66.49502866900002
+          ],
+          [
+            66.28683742499561,
+            65.89725867600646,
+            66.43628239599639
+          ],
+          [
+            66.38141259500117,
+            65.9745224740036,
+            66.0512229790038
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            66.37408934198902,
+            66.28683742499561,
+            66.0512229790038
+          ],
+          "median": 66.28683742499561,
+          "range": [
+            66.0512229790038,
+            66.37408934198902
+          ],
+          "population_standard_deviation": 0.1363694950111483
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 9.082205565391632e-08,
+          "force_max_abs_hartree_per_bohr": 2.3093992033540456e-05,
+          "force_rms_hartree_per_bohr": 1.0072864448151756e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "a400a7514c484323f8e64c2cfbde994fe7f9a1ff22eec4541eb81244f7bbad8e",
+          "generativeqc_stationary_pbe0_rks_spd.json": "399d1b6b33fd4e67e1c6f21ec3fc0521192654419f9c6fdea4eb5f772786773a",
+          "libgenerativeqc_stationary_pbe0_rks.so": "7a438d6f745ec99e33e643ed6c4ca21b6b77fa8f3c7bb5c85817f7773f83286a",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "6e1dc94f4f18152b93ce3d97ff903a9f28b3951f911f1ccac7febbe57674b4bd"
+        }
+      },
+      "candidate": {
+        "cold_seconds": {
+          "values": [
+            37.118254463988706,
+            36.71397028300271,
+            37.34527242400509
+          ],
+          "median": 37.118254463988706,
+          "range": [
+            36.71397028300271,
+            37.34527242400509
+          ],
+          "population_standard_deviation": 0.26109284138441935
+        },
+        "cold_work": [
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "warm_seconds_by_process": [
+          [
+            9.735484796998207,
+            9.674042318991269,
+            9.840959517998272
+          ],
+          [
+            9.695690219989046,
+            9.640614399002516,
+            9.690865202996065
+          ],
+          [
+            9.730663431007997,
+            9.778437468004995,
+            9.765775806998136
+          ]
+        ],
+        "warm_process_medians_seconds": {
+          "values": [
+            9.735484796998207,
+            9.690865202996065,
+            9.765775806998136
+          ],
+          "median": 9.735484796998207,
+          "range": [
+            9.690865202996065,
+            9.765775806998136
+          ],
+          "population_standard_deviation": 0.03076804267000063
+        },
+        "warm_work": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "maximum_oracle_errors": {
+          "energy_abs_per_atom_hartree": 9.082205565391632e-08,
+          "force_max_abs_hartree_per_bohr": 2.309399202379825e-05,
+          "force_rms_hartree_per_bohr": 1.0072864448050401e-05
+        },
+        "aot_sha256": {
+          "generativeqc_stationary_pbe0_rks.json": "fd9c5734d029d20a9a838d572a186e4a03c9cc4c373f90231a90cb1c27035980",
+          "generativeqc_stationary_pbe0_rks_spd.json": "6cc66c5b702b4c4691d4042e20c9c8f8141b4c65a927bede3d292d22eee4fb54",
+          "libgenerativeqc_stationary_pbe0_rks.so": "fcd3983b933f61e1c5aa2806d0b5e63f49d2e40173a94a52358c90da3b310785",
+          "libgenerativeqc_stationary_pbe0_rks_spd.so": "7513e335419aefc99288b29e2f1410c8cb1f60e9752c8522c2038c6b10ea570c"
+        }
+      },
+      "cold_speedup": 2.5226277534909345,
+      "warm_speedup": 6.808786496737602
+    }
+  ]
+}

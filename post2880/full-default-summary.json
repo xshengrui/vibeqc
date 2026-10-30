@@ -1,0 +1,1417 @@
+{
+  "schema": "generativeqc.h100-post2880-complete-summary.v1",
+  "status": "PASS_SCOPED_COMPLETE_ENDPOINTS",
+  "campaign_sha256": "507e209256cc7f8cb750b42f74cb7c0fdd91c39e343c7cc5ebf26a8cf9736fa8",
+  "source_revision": "a3d7e5c3deff7e7590bb4cb7479b49a72a594611",
+  "driver_sha256": "5bc8f1fc77e7b1ec07a2fcbb2b9b881c4497146b12c9248ee03748771ea367b9",
+  "library_sha256": "624f3b1295a360cffdeceeea5c1bb31acd968e89728b4b672ce7c31ee3eab9e2",
+  "probe_sha256": "dd52a1c9bf7586dde183493a204edda850b58a9798a5875afc7b17c46c238501",
+  "aot_sha256": {
+    "generativeqc_stationary_pbe0_rks.json": "23d43b8b9732858de04ecb70b610d1bca4fa14212dff3b84a8329266db060cb9",
+    "generativeqc_stationary_pbe0_rks_spd.json": "453e68768e7573f5929c7ba727208835ec4fcbd65657bd62224b87c9fa89fd24",
+    "libgenerativeqc_stationary_pbe0_rks.so": "433433a32f465c7ba7a786287165cfa2d20e12561b794af8c45a92fb665923f5",
+    "libgenerativeqc_stationary_pbe0_rks_spd.so": "2e482e6e3ab64e207c057700075fe609f21fe71321095010509098dbc2a22ec8"
+  },
+  "device_identity": [
+    "NVIDIA H100 80GB HBM3",
+    "GPU-7b6f97c0-bd5e-7859-9da7-4b17bc37d234",
+    "9.0",
+    "Disabled",
+    "595.58.03"
+  ],
+  "sampled_memory_used": [
+    "0 MiB"
+  ],
+  "sampled_sm_clocks": [
+    "1980 MHz",
+    "345 MHz"
+  ],
+  "independent_processes": 24,
+  "complete_ef_endpoints": 96,
+  "groups": [
+    {
+      "atoms": 48,
+      "mode": "direct",
+      "arm": "standard",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          16.328259970003273,
+          15.955637140956242,
+          16.049902883009054
+        ],
+        "median_seconds": 16.049902883009054,
+        "range_seconds": [
+          15.955637140956242,
+          16.328259970003273
+        ],
+        "population_standard_deviation_seconds": 0.15818992478511681
+      },
+      "warm_seconds_by_process": [
+        [
+          2.6777505229692906,
+          2.677816870971583,
+          2.686936171958223
+        ],
+        [
+          2.676353312039282,
+          2.682937078003306,
+          2.681052448984701
+        ],
+        [
+          2.6728097190498374,
+          2.6773162489989772,
+          2.672517783008516
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          2.677816870971583,
+          2.681052448984701,
+          2.6728097190498374
+        ],
+        "median_seconds": 2.677816870971583,
+        "range_seconds": [
+          2.6728097190498374,
+          2.681052448984701
+        ],
+        "population_standard_deviation_seconds": 0.003390888645006602
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 2.9692172158017155e-07,
+        "force_max_abs_hartree_per_bohr": 2.2478392319780216e-05,
+        "force_rms_hartree_per_bohr": 1.0857926244369287e-05
+      }
+    },
+    {
+      "atoms": 48,
+      "mode": "direct",
+      "arm": "fast",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          7.931255256000441,
+          7.911294247955084,
+          7.945051186019555
+        ],
+        "median_seconds": 7.931255256000441,
+        "range_seconds": [
+          7.911294247955084,
+          7.945051186019555
+        ],
+        "population_standard_deviation_seconds": 0.01385761080404561
+      },
+      "warm_seconds_by_process": [
+        [
+          2.282601152022835,
+          2.2782180520007387,
+          2.271950430003926
+        ],
+        [
+          2.2749709640047513,
+          2.271380534977652,
+          2.2712206799769774
+        ],
+        [
+          2.2901073709945194,
+          2.279593350016512,
+          2.282836905971635
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          2.2782180520007387,
+          2.271380534977652,
+          2.282836905971635
+        ],
+        "median_seconds": 2.2782180520007387,
+        "range_seconds": [
+          2.271380534977652,
+          2.282836905971635
+        ],
+        "population_standard_deviation_seconds": 0.004706188448288526
+      },
+      "cold_work": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 2.969796166022813e-07,
+        "force_max_abs_hartree_per_bohr": 2.2310080518894715e-05,
+        "force_rms_hartree_per_bohr": 1.0859702656220513e-05
+      }
+    },
+    {
+      "atoms": 48,
+      "mode": "df",
+      "arm": "standard",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          3.50942869996652,
+          3.4805749129736796,
+          3.5210444040130824
+        ],
+        "median_seconds": 3.50942869996652,
+        "range_seconds": [
+          3.4805749129736796,
+          3.5210444040130824
+        ],
+        "population_standard_deviation_seconds": 0.017013867903415456
+      },
+      "warm_seconds_by_process": [
+        [
+          1.2304763419670053,
+          1.2351225970196538,
+          1.2293171000201255
+        ],
+        [
+          1.2182744650053792,
+          1.2168608999927528,
+          1.2169812869979069
+        ],
+        [
+          1.2294923909939826,
+          1.2258027709904127,
+          1.235818041022867
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          1.2304763419670053,
+          1.2169812869979069,
+          1.2294923909939826
+        ],
+        "median_seconds": 1.2294923909939826,
+        "range_seconds": [
+          1.2169812869979069,
+          1.2304763419670053
+        ],
+        "population_standard_deviation_seconds": 0.006142858467240379
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 8.972052019847372e-08,
+        "force_max_abs_hartree_per_bohr": 2.3048587883600646e-05,
+        "force_rms_hartree_per_bohr": 1.0053939491083677e-05
+      }
+    },
+    {
+      "atoms": 48,
+      "mode": "df",
+      "arm": "fast",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          3.5627736360183917,
+          3.552471930044703,
+          3.543654924025759
+        ],
+        "median_seconds": 3.552471930044703,
+        "range_seconds": [
+          3.543654924025759,
+          3.5627736360183917
+        ],
+        "population_standard_deviation_seconds": 0.007813022529111676
+      },
+      "warm_seconds_by_process": [
+        [
+          1.2204514219774865,
+          1.218978734978009,
+          1.2159114939859137
+        ],
+        [
+          1.2361955940141343,
+          1.2397282750462182,
+          1.2346228010137565
+        ],
+        [
+          1.2394738319562748,
+          1.2372525079990737,
+          1.2390493780258112
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          1.218978734978009,
+          1.2361955940141343,
+          1.2390493780258112
+        ],
+        "median_seconds": 1.2361955940141343,
+        "range_seconds": [
+          1.218978734978009,
+          1.2390493780258112
+        ],
+        "population_standard_deviation_seconds": 0.008865632963599754
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 8.972052019847372e-08,
+        "force_max_abs_hartree_per_bohr": 2.304858788371167e-05,
+        "force_rms_hartree_per_bohr": 1.0053939490422043e-05
+      }
+    },
+    {
+      "atoms": 96,
+      "mode": "direct",
+      "arm": "standard",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          57.4422653830261,
+          57.33804053196218,
+          57.35729968600208
+        ],
+        "median_seconds": 57.35729968600208,
+        "range_seconds": [
+          57.33804053196218,
+          57.4422653830261
+        ],
+        "population_standard_deviation_seconds": 0.04528048913213153
+      },
+      "warm_seconds_by_process": [
+        [
+          9.24650028796168,
+          9.248470572987571,
+          9.257351909996942
+        ],
+        [
+          9.287884025950916,
+          9.255661898991093,
+          9.259397508983966
+        ],
+        [
+          9.24202334403526,
+          9.241965821012855,
+          9.245340049033985
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          9.248470572987571,
+          9.259397508983966,
+          9.24202334403526
+        ],
+        "median_seconds": 9.248470572987571,
+        "range_seconds": [
+          9.24202334403526,
+          9.259397508983966
+        ],
+        "population_standard_deviation_seconds": 0.007171132709982672
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 2.9740754807032016e-07,
+        "force_max_abs_hartree_per_bohr": 2.257209373010549e-05,
+        "force_rms_hartree_per_bohr": 1.08885101326211e-05
+      }
+    },
+    {
+      "atoms": 96,
+      "mode": "direct",
+      "arm": "fast",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          25.31240275601158,
+          25.164900904987007,
+          25.260150468035135
+        ],
+        "median_seconds": 25.260150468035135,
+        "range_seconds": [
+          25.164900904987007,
+          25.31240275601158
+        ],
+        "population_standard_deviation_seconds": 0.06106424387052223
+      },
+      "warm_seconds_by_process": [
+        [
+          7.28454249195056,
+          7.267972796980757,
+          7.27687479602173
+        ],
+        [
+          7.277102955034934,
+          7.255054728011601,
+          7.268878404982388
+        ],
+        [
+          7.2726929759955965,
+          7.263904240971897,
+          7.275926079018973
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          7.27687479602173,
+          7.268878404982388,
+          7.2726929759955965
+        ],
+        "median_seconds": 7.2726929759955965,
+        "range_seconds": [
+          7.268878404982388,
+          7.27687479602173
+        ],
+        "population_standard_deviation_seconds": 0.0032656603960309156
+      },
+      "cold_work": [
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 2.974914821152197e-07,
+        "force_max_abs_hartree_per_bohr": 2.2535255790850917e-05,
+        "force_rms_hartree_per_bohr": 1.0959685836867205e-05
+      }
+    },
+    {
+      "atoms": 96,
+      "mode": "df",
+      "arm": "standard",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          12.190569286991376,
+          12.259220456006005,
+          12.226996078970842
+        ],
+        "median_seconds": 12.226996078970842,
+        "range_seconds": [
+          12.190569286991376,
+          12.259220456006005
+        ],
+        "population_standard_deviation_seconds": 0.02804422035186331
+      },
+      "warm_seconds_by_process": [
+        [
+          5.653986982011702,
+          5.654106454981957,
+          5.637873012979981
+        ],
+        [
+          5.656944087008014,
+          5.647775290010031,
+          5.6432221090071835
+        ],
+        [
+          5.662031224987004,
+          5.653382912976667,
+          5.661805392010137
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          5.653986982011702,
+          5.647775290010031,
+          5.661805392010137
+        ],
+        "median_seconds": 5.653986982011702,
+        "range_seconds": [
+          5.647775290010031,
+          5.661805392010137
+        ],
+        "population_standard_deviation_seconds": 0.0057402711372338214
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        },
+        {
+          "native_prepared_force_eligible": true,
+          "generated_force_count": null,
+          "status": "MEASURED_POST_ENDPOINT"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 9.082172880425787e-08,
+        "force_max_abs_hartree_per_bohr": 2.3146778229343745e-05,
+        "force_rms_hartree_per_bohr": 1.0087654513189493e-05
+      }
+    },
+    {
+      "atoms": 96,
+      "mode": "df",
+      "arm": "fast",
+      "cold_seconds": {
+        "raw_process_seconds": [
+          12.234182893997058,
+          12.243222956021782,
+          12.219129099044949
+        ],
+        "median_seconds": 12.234182893997058,
+        "range_seconds": [
+          12.219129099044949,
+          12.243222956021782
+        ],
+        "population_standard_deviation_seconds": 0.009937881553212334
+      },
+      "warm_seconds_by_process": [
+        [
+          5.659155827015638,
+          5.6443499570013955,
+          5.655775883002207
+        ],
+        [
+          5.649312477966305,
+          5.6434562359936535,
+          5.645088527991902
+        ],
+        [
+          5.655952956003603,
+          5.648180446005426,
+          5.657995015033521
+        ]
+      ],
+      "warm_process_medians_seconds": {
+        "raw_process_seconds": [
+          5.655775883002207,
+          5.645088527991902,
+          5.655952956003603
+        ],
+        "median_seconds": 5.655775883002207,
+        "range_seconds": [
+          5.645088527991902,
+          5.655952956003603
+        ],
+        "population_standard_deviation_seconds": 0.005080318318827505
+      },
+      "cold_work": [
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          9,
+          9
+        ]
+      ],
+      "warm_work": [
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ],
+        [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ],
+      "force_routes": [
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        },
+        {
+          "native_prepared_force_eligible": null,
+          "generated_force_count": null,
+          "status": "UNAVAILABLE_FAST_OWNER_BOUNDARY"
+        }
+      ],
+      "maximum_oracle_errors": {
+        "energy_abs_per_atom_hartree": 9.082172880425787e-08,
+        "force_max_abs_hartree_per_bohr": 2.314677822468081e-05,
+        "force_rms_hartree_per_bohr": 1.0087654514011038e-05
+      }
+    }
+  ]
+}

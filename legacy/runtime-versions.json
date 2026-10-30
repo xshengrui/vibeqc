@@ -1,0 +1,12 @@
+{
+  "schema": "h100.current-shared-env-versions.v1",
+  "observed_utc": "2026-10-29T14:05:35.161670+00:00",
+  "python": "3.11.16",
+  "packages": {
+    "gpu4pyscf-cuda12x": "1.8.1",
+    "cupy-cuda12x": "13.6.0",
+    "pyscf": "2.14.0",
+    "numpy": "2.2.6"
+  },
+  "scope": "same shared env path/image; separate query, not original released-worker receipt"
+}

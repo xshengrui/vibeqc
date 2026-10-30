@@ -1,0 +1,21 @@
+diff --git a/python/generativeqc_compiler/method/stationary_resources.py b/python/generativeqc_compiler/method/stationary_resources.py
+index 261823cb4..4a5c7191b 100644
+--- a/python/generativeqc_compiler/method/stationary_resources.py
++++ b/python/generativeqc_compiler/method/stationary_resources.py
+@@ -256,14 +256,14 @@ def plan_stationary_cuda_resources(
+     Small tiles and tight budgets naturally retain a single-block schedule.
+     A tail uses only min(planned lanes, tail points) of the retained panels.
+     No device probe or allocation is part of this compiler planning function.
+-    Automatic cooperation is restricted to the measured sm_120 large-point
++    Automatic cooperation is restricted to sm_90 and sm_120 large-point
+     domain. Explicit False retains the generic schedule; unqualified targets
+     and small systems retain it automatically. Shared-memory admission below
+     is mandatory even when cooperation is requested.
+     """
+     if cooperative_becke is None:
+         cooperative_becke = (
+-            target.compute_capability == (12, 0)
++            target.compute_capability in ((9, 0), (12, 0))
+             and type(atoms) is int
+             and 12 <= atoms <= BECKE_COOPERATIVE_MAX_ATOMS
+         )
